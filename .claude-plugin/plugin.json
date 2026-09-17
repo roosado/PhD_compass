@@ -1,6 +1,6 @@
 {
   "name": "phd-compass",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Find funded PhD positions, programmes and groups that fit a CV, in any field and country, then tailor documents, prepare interviews and track applications. Works in Claude Code and in claude.ai chats.",
   "license": "MIT",
   "keywords": ["phd", "academia", "applications", "cv", "scholarships", "research"],

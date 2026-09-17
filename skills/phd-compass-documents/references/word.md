@@ -3,7 +3,7 @@
 Two routes produce the same look; use the first that works.
 
 ## Route 1: `scripts/md_to_docx.py` (python-docx)
-1. Write the document in the Markdown dialect described at the top of the script; templates: `assets/word/cv.md`, `assets/word/letter.md`.
+1. Write the document in the Markdown dialect described at the top of the script; template: `assets/word/cv.md`.
 2. Check python-docx: `python3 -c "import docx"`. If it is missing and installing packages is allowed, `pip install python-docx`.
 3. Build: `python3 scripts/md_to_docx.py <file>.md <file>.docx`.
 4. Check: open the result with python-docx and confirm the paragraphs and headings are present. When a converter is available (LibreOffice `soffice --headless --convert-to pdf`, or Word), export a PDF and check the page count against the limit.

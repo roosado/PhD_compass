@@ -3,7 +3,7 @@ name: phd-compass-interviews
 description: Prepare a PhD applicant for interviews with supervisors, panels and doctoral programmes - research the group, build answers from the applicant's real experience, draft the research pitch and questions to ask, run a mock interview with feedback, and record notes and follow-ups afterwards. Use when someone has a PhD interview, a call with a potential supervisor or a programme visit day coming up, wants to practise interview questions or their research pitch, or wants to debrief after one.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   family: phd-compass
 ---
 

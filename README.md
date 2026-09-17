@@ -11,7 +11,7 @@ Everything lives in one **save file** (`phd-compass.md`), so a search can contin
 | Skill | What it does |
 |---|---|
 | **phd-compass** (core) | Reads your CV and asks the gap questions (citizenship, residence history, degree dates, start window, funding rule, regions). Ranks your research areas. Explains how PhDs are funded in your chosen regions and builds your eligibility checklist. Scans job boards, programme pages, paper and grant databases and scholarship schemes. Ranks every target A/B/C with sourced funding and eligibility. Researches individual groups in depth. Renders the HTML report. |
-| **phd-compass-documents** | Rebuilds your CV in **Word or LaTeX**, then tailors copies for a target. Writes motivation letters, statements of purpose, research proposals and emails to potential supervisors. Critiques any draft as a selection committee would. |
+| **phd-compass-documents** | Rebuilds your CV in **Word or LaTeX**, then tailors copies for a target. Writes research proposals and emails to potential supervisors. You write your own motivation letters and statements of purpose; the skill critiques them (and any other draft) as a selection committee would, checking fit, evidence and consistency with your CV. |
 | **phd-compass-interviews** | Prepares a prep sheet for a specific interview (the group's recent work, likely questions with answers built from your real experience, pitch, questions to ask), runs mock interviews with feedback, and records the debrief. |
 | **phd-compass-tracking** | Agenda of what is due; records submissions, emails, replies, interviews, offers and rejections; referee requests with brag sheets; external scholarship applications; calendar reminders (via a calendar connector or an `.ics` file). |
 
@@ -37,7 +37,7 @@ A full scan is long. In chat, the skill works in batches (one region and one or 
 ## Things to know
 - **Check before you act.** Every fact the skills record about a position, grant or rule carries a source link and access date, or says `unknown`. Rules and deadlines change; open the link before you rely on a claim.
 - **Your data.** The save file holds personal details (citizenship, residence history, grades). It stays where you keep it; the skills send nothing anywhere except the web searches Claude runs.
-- **You stay in control.** Claude drafts emails and applications; you send and submit them. Documents use only facts you have confirmed.
+- **You stay in control.** Claude drafts your CV, research proposal and emails, and reviews the letters and statements you write yourself; you send and submit everything. Documents use only facts you have confirmed.
 - **The region notes are structural.** `skills/phd-compass/references/regions/` explains how PhDs are usually funded and found in Continental Europe, the UK and Ireland, the US and Canada, and elsewhere, with sources accessed 2026-09-17. Stipends, fees and deadlines are always looked up live.
 
 ## Example

@@ -6,7 +6,7 @@ A review as a selection committee at the target would give it: a busy PI and pan
 The draft (for LaTeX, the source plus the built PDF when one exists; for Word, the built document). The owner's Profile. With a target: its requirements, its research facts and the call's criteria. Without one: judge against a typical funded PhD application in the owner's core area and first region, and say so.
 
 ## 2. Read as the committee; run every check
-1. **Fit:** does it answer why this group or programme, why this project, why this person, with evidence specific to the target?
+1. **Fit:** does it answer why this group or programme, why this project, why this person, with evidence specific to the target? For a motivation letter, statement of purpose or personal statement, judge it against the genre's expected shape in `references/letters.md`.
 2. **Evidence:** is every claim of skill or motivation backed by a concrete episode, result or number?
 3. **Structure:** is the strongest point in the first two sentences, and does every paragraph earn its place?
 4. **Requirements:** length and page limits, requested content, format, prompts answered in order.

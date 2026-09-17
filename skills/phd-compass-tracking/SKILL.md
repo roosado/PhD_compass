@@ -3,7 +3,7 @@ name: phd-compass-tracking
 description: Track PhD applications end to end - what is due, submissions, outreach follow-ups, referee letters, scholarship applications, materials readiness and calendar reminders - in a phd-compass.md save file. Use when someone asks what is due or what to do next in their PhD applications, records that they submitted an application or sent an email, got a reply, an interview invitation, an offer or a rejection, needs to ask referees for letters, or wants PhD deadlines in their calendar.
 license: MIT
 metadata:
-  version: "1.0.0"
+  version: "1.0.1"
   family: phd-compass
 ---
 

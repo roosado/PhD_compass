@@ -1,6 +1,6 @@
 # Building LaTeX documents
 
-Templates: `assets/latex/cv.tex`, `letter.tex`, `proposal.tex`, all loading `assets/latex/phd-compass.sty` from the same folder. Copy the `.sty` next to every `.tex` you write.
+Templates: `assets/latex/cv.tex`, `proposal.tex`, both loading `assets/latex/phd-compass.sty` from the same folder. Copy the `.sty` next to every `.tex` you write.
 
 ## Options
 `\usepackage[letterpaper]{phd-compass}` for US Letter (default A4); `[compact]` tightens section spacing when a page limit is close.
