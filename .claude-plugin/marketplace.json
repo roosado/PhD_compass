@@ -1,0 +1,16 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "phd-compass",
+  "description": "Skills for finding and applying to funded PhD positions.",
+  "owner": {
+    "name": "phd-compass contributors"
+  },
+  "plugins": [
+    {
+      "name": "phd-compass",
+      "description": "Find funded PhD positions, programmes and groups that fit a CV, then tailor documents, prepare interviews and track applications.",
+      "source": "./",
+      "category": "productivity"
+    }
+  ]
+}
