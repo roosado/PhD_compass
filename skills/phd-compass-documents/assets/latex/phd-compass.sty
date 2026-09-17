@@ -1,0 +1,64 @@
+\NeedsTeXFormat{LaTeX2e}
+\ProvidesPackage{phd-compass}[2026/09/17 Shared look for PhD application CVs, letters and proposals]
+
+% Options: letterpaper (default A4), compact (smaller vertical spacing for a strict page limit).
+\newif\ifpc@letter \pc@letterfalse
+\newif\ifpc@compact \pc@compactfalse
+\DeclareOption{letterpaper}{\pc@lettertrue}
+\DeclareOption{compact}{\pc@compacttrue}
+\ProcessOptions\relax
+
+\ifpc@letter
+  \RequirePackage[letterpaper,margin=0.9in]{geometry}
+\else
+  \RequirePackage[a4paper,margin=2.2cm]{geometry}
+\fi
+\RequirePackage[T1]{fontenc}
+\RequirePackage[utf8]{inputenc}
+\RequirePackage{lmodern}
+\RequirePackage{microtype}
+\RequirePackage{enumitem}
+\RequirePackage{titlesec}
+\RequirePackage{setspace}
+\RequirePackage{xcolor}
+\RequirePackage[hidelinks]{hyperref}
+
+\definecolor{pcmuted}{gray}{0.35}
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{4pt}
+% Lets a paragraph that cannot otherwise be set stretch instead of overflowing; paragraphs that fit are unaffected.
+\setlength{\emergencystretch}{1.5em}
+
+% Section titles: bold, over a full-width rule.
+\titleformat{\section}{\large\bfseries}{}{0pt}{}[\vspace{2pt}\titlerule]
+\ifpc@compact
+  \titlespacing{\section}{0pt}{10pt}{6pt}
+\else
+  \titlespacing{\section}{0pt}{14pt}{8pt}
+\fi
+
+\setlist[itemize,1]{label=\textbullet, leftmargin=14pt, labelsep=6pt, topsep=2pt, itemsep=2pt, parsep=0pt}
+\setlist[itemize,2]{label=\textendash, leftmargin=14pt, labelsep=6pt, topsep=1pt, itemsep=1pt, parsep=0pt}
+
+% \cvheader{Name}{Contact line}{Second line (optional, may be empty)}
+\newcommand{\cvheader}[3]{%
+  {\centering{\LARGE\bfseries #1\par}\vspace{4pt}{\small #2\par}%
+  \if\relax\detokenize{#3}\relax\else{\small\color{pcmuted} #3\par}\fi}\vspace{6pt}}
+
+% \cventry{Title}{Place}{Dates}: bold title and dates on one line, place underneath; description follows.
+\newcommand{\cventry}[3]{%
+  \par\noindent\textbf{#1}\hfill{\small #3}\par
+  \if\relax\detokenize{#2}\relax\else\noindent{\small\itshape #2}\par\fi
+  \vspace{1pt}}
+
+% \cvitem{Label}{Text}: a short labelled line, e.g. skills.
+\newcommand{\cvitem}[2]{\par\noindent\textbf{#1:} #2\par}
+
+% \letterheader{Sender name}{Sender contact}{Recipient block}{Date}
+\newcommand{\letterheader}[4]{%
+  {\raggedleft{\large\bfseries #1\par}{\small #2\par}}\vspace{12pt}
+  {#3\par}\vspace{8pt}
+  {\raggedleft #4\par}\vspace{10pt}}
+
+% \lettersignature{Name}
+\newcommand{\lettersignature}[1]{\par\vspace{14pt}#1\par}

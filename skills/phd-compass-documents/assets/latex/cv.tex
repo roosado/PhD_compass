@@ -1,0 +1,40 @@
+% CV template for phd-compass. Keep phd-compass.sty in the same folder (or adjust the path below).
+% Build: latexmk -pdf cv.tex   (or pdflatex cv.tex twice). Replace every <...>; delete sections that do not apply.
+\documentclass[10pt]{article}
+\usepackage{phd-compass}          % options: [letterpaper], [compact]
+\hypersetup{pdftitle={Curriculum Vitae - <Name>}, pdfauthor={<Name>}}
+
+\begin{document}
+
+\cvheader{<Name>}
+  {<City, Country> \enspace\textbullet\enspace \href{mailto:<email>}{<email>} \enspace\textbullet\enspace <link to website, ORCID or GitHub>}
+  {<Citizenship, if relevant to the application>}
+
+\section{Education}
+\cventry{<Degree, field>}{<Institution, Country>}{<YYYY-MM> -- <YYYY-MM or expected YYYY-MM>}
+<Grade with scale. Thesis: title, supervisor.>
+
+\section{Research experience}
+\cventry{<Project or role>}{<Group, institution>}{<YYYY-MM> -- <YYYY-MM>}
+\begin{itemize}
+  \item <What you did, with methods and a concrete result.>
+\end{itemize}
+
+\section{Publications and presentations}
+\begin{itemize}
+  \item <Authors (you in bold), title, venue, year, DOI or link.>
+\end{itemize}
+
+\section{Skills}
+\cvitem{<Methods>}{<...>}
+\cvitem{<Programming and software>}{<...>}
+\cvitem{Languages}{<Language (level), ...>}
+
+\section{Awards and service}
+\cventry{<Award or role>}{<Awarding body>}{<YYYY>}
+
+\section{References}
+<Name, position, institution, email> \\
+<Name, position, institution, email>
+
+\end{document}

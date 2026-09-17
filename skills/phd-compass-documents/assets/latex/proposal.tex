@@ -1,0 +1,45 @@
+% Research proposal template for phd-compass. Keep phd-compass.sty in the same folder.
+% Build: latexmk -pdf proposal.tex. Follow the call's length limit.
+\documentclass[10pt]{article}
+\usepackage{phd-compass}
+\hypersetup{pdftitle={Research proposal - <Name>}, pdfauthor={<Name>}}
+
+\begin{document}
+
+\begin{center}
+  {\Large\bfseries <Proposal title>\par}
+  \vspace{6pt}
+  {\small <Name> \enspace\textbullet\enspace Proposal for <group or programme, institution> \enspace\textbullet\enspace <Month Year>\par}
+\end{center}
+
+\section{Background and gap}
+<What is known, with citations [1], and the specific gap this project addresses.>
+
+\section{Questions and objectives}
+\begin{itemize}
+  \item <Question 1, with a measurable objective.>
+  \item <Question 2, with a measurable objective.>
+\end{itemize}
+
+\section{Approach and methods}
+<Methods, data or experiments for each objective; why the host group's facilities and expertise make it feasible.>
+
+\section{Work plan}
+\begin{tabular}{@{}p{0.14\textwidth}p{0.80\textwidth}@{}}
+  Year 1 & <Milestones> \\
+  Year 2 & <Milestones> \\
+  Year 3 & <Milestones and thesis writing> \\
+\end{tabular}
+
+\section{Risks and alternatives}
+<The main risk for each objective and the fallback.>
+
+\section{Fit}
+<Your preparation for this project, and how it builds on the group's recent work.>
+
+\section*{References}
+\begin{enumerate}[label={[\arabic*]}, leftmargin=20pt, itemsep=1pt]
+  \item <Authors, title, venue, year, DOI.>
+\end{enumerate}
+
+\end{document}
