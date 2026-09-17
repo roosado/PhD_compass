@@ -1,0 +1,866 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>__COMPASS_TITLE__</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+:root{
+  color-scheme: light;
+  --page:#f2f4f5; --surface:#fbfcfc; --surface-2:#e9eef0; --ink:#0e1a21; --ink-2:#45535c; --muted:#6c7982;
+  --hair:#dde3e6; --axis:#c2cbd0; --border:rgba(14,26,33,.12);
+  --accent:#0b6b70; --accent-wash:rgba(11,107,112,.09);
+  --sig-young:#104281; --sig-network:#1c5cab; --sig-project:#2a78d6; --sig-endsnear:#5598e7; --sig-endsbefore:#86b6ef; --sig-none:#c3cbd0; --sig-position:transparent; --sig-na:transparent;
+  --ad:#eb6834; --good:#0ca30c; --good-text:#006300; --warn:#fab219; --warn-text:#7a5100;
+  --band-thesis:rgba(69,83,92,.08); --band-start:rgba(11,107,112,.12);
+  --font-ui:"Schibsted Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono:"IBM Plex Mono", ui-monospace, "Cascadia Mono", Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    color-scheme: dark;
+    --page:#0b1013; --surface:#141a1e; --surface-2:#1d252b; --ink:#e9eff2; --ink-2:#b2bec5; --muted:#8a969e;
+    --hair:#242e35; --axis:#36434b; --border:rgba(233,239,242,.12);
+    --accent:#5fc3c7; --accent-wash:rgba(95,195,199,.13);
+    --sig-young:#cde2fb; --sig-network:#9ec5f4; --sig-project:#6da7ec; --sig-endsnear:#3987e5; --sig-endsbefore:#256abf; --sig-none:#3b464d;
+    --ad:#d95926; --good:#0ca30c; --good-text:#3cc43c; --warn:#fab219; --warn-text:#fab219;
+    --band-thesis:rgba(178,190,197,.07); --band-start:rgba(95,195,199,.13);
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme: dark;
+  --page:#0b1013; --surface:#141a1e; --surface-2:#1d252b; --ink:#e9eff2; --ink-2:#b2bec5; --muted:#8a969e;
+  --hair:#242e35; --axis:#36434b; --border:rgba(233,239,242,.12);
+  --accent:#5fc3c7; --accent-wash:rgba(95,195,199,.13);
+  --sig-young:#cde2fb; --sig-network:#9ec5f4; --sig-project:#6da7ec; --sig-endsnear:#3987e5; --sig-endsbefore:#256abf; --sig-none:#3b464d;
+  --ad:#d95926; --good:#0ca30c; --good-text:#3cc43c; --warn:#fab219; --warn-text:#fab219;
+  --band-thesis:rgba(178,190,197,.07); --band-start:rgba(95,195,199,.13);
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0;background:var(--page);color:var(--ink);font-family:var(--font-ui);font-size:15px;line-height:1.5}
+a{color:var(--accent);text-underline-offset:2px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:44px}
+.wrap > *{min-width:0}
+@media (max-width:480px){.wrap{padding-inline:16px;gap:36px}}
+
+/* header */
+.eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 8px}
+h1{font-size:clamp(30px,4.4vw,44px);line-height:1.05;letter-spacing:-.015em;font-weight:700;margin:0 0 14px;text-wrap:balance}
+.lede{font-size:17px;max-width:68ch;margin:0 0 10px;color:var(--ink)}
+.meta{font-size:13px;color:var(--muted);margin:0;max-width:80ch}
+
+h2{font-size:20px;font-weight:650;letter-spacing:-.005em;margin:0 0 4px;text-wrap:balance}
+.sub-h{font-size:14px;color:var(--ink-2);margin:0 0 16px;max-width:75ch}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:18px 20px}
+@media (max-width:480px){.panel{padding:14px}}
+.note{font-size:14px;color:var(--ink-2);margin:0}
+
+/* next up */
+.next{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fit,minmax(172px,1fr));gap:14px 18px}
+.next li{border-top:2px solid var(--axis);padding-top:10px;display:grid;gap:3px;align-content:start}
+.next li.soon{border-top-color:var(--warn)}
+.next .when{font-family:var(--font-mono);font-size:13px;font-weight:500}
+.next .rel{font-size:12.5px;color:var(--ink-2);display:flex;align-items:center;gap:5px}
+.next li.soon .rel{color:var(--warn-text);font-weight:600}
+.next .what{font-size:13.5px;line-height:1.4;overflow-wrap:anywhere}
+.ico-warn{width:12px;height:12px;flex:none}
+
+/* stats */
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:18px 0;margin-top:26px}
+.stat{padding:2px 18px;border-left:1px solid var(--hair)}
+.stat .v{font-size:32px;font-weight:650;line-height:1.1}
+.stat .l{font-size:13.5px;font-weight:500}
+.stat .s{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+
+/* signal bar */
+.sigbar{display:flex;gap:2px;height:22px;margin:4px 0 14px}
+.sigbar button{border:0;padding:0;min-width:10px;cursor:pointer;background:var(--sw)}
+.sigbar button:first-child{border-radius:4px 0 0 4px}
+.sigbar button:last-child{border-radius:0 4px 4px 0}
+.sigbar.filtered button:not(.on){opacity:.3}
+.legend{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0;padding:0;list-style:none;font-size:13px;color:var(--ink-2)}
+.legend li{display:inline-flex;align-items:center;gap:6px}
+.legend button{display:inline-flex;align-items:center;gap:6px;border:0;background:none;padding:2px 0;cursor:pointer;color:var(--ink-2);font-size:13px}
+.legend button:hover{color:var(--ink)}
+.legend .n{font-family:var(--font-mono);color:var(--ink);font-size:12.5px}
+
+/* shared marks */
+.sw{width:10px;height:10px;border-radius:2px;background:var(--sw);flex:none;display:inline-block}
+.sw-hollow{background:transparent;box-shadow:inset 0 0 0 1.5px var(--ink-2)}
+.badge{display:inline-grid;place-items:center;width:18px;height:18px;border-radius:4px;font:600 11px/1 var(--font-mono);flex:none}
+.b-A{background:var(--ink);color:var(--surface)}
+.b-B{box-shadow:inset 0 0 0 1.5px var(--ink-2);color:var(--ink)}
+.b-C{border:1px dashed var(--muted);color:var(--muted)}
+.pm{width:8px;height:8px;border-radius:50%;flex:none;display:inline-block}
+.pm-open{background:var(--good)}
+.pm-up{border:1.5px dashed var(--good)}
+.pm-call{box-shadow:inset 0 0 0 2px var(--good)}
+.pm-poor{box-shadow:inset 0 0 0 1.5px var(--muted)}
+.pm-past{width:8px;height:2px;border-radius:1px;background:var(--muted)}
+.new-tag{display:inline-block;font:600 10px/1 var(--font-mono);text-transform:uppercase;letter-spacing:.06em;padding:3px 5px;border-radius:3px;background:var(--accent-wash);color:var(--accent);vertical-align:1px}
+.cc{font-family:var(--font-mono);font-size:11.5px;text-transform:uppercase;color:var(--muted);letter-spacing:.04em}
+
+/* matrix */
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+table.matrix{border-collapse:collapse;width:100%}
+.matrix th,.matrix td{border-bottom:1px solid var(--hair);padding:9px 10px;text-align:left;vertical-align:top}
+.matrix thead th{font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;border-bottom-color:var(--axis)}
+.matrix thead th .cnt,.matrix tbody th .cnt{font-family:var(--font-mono);font-weight:400;color:var(--muted);margin-left:4px}
+.matrix tbody th{font-size:14px;font-weight:600;white-space:nowrap;width:150px}
+.matrix tbody th .cc{margin-left:6px}
+.cell{display:flex;flex-wrap:wrap;gap:6px}
+.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:3px 9px 3px 7px;cursor:pointer;font-size:13px;line-height:1.3;text-align:left}
+.chip:hover{background:var(--surface-2)}
+.chip.pri-C .nm{color:var(--ink-2)}
+.chip .pm-t{font-size:11px;color:var(--ink-2)}
+.matrix-legend{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 22px;font-size:12.5px;color:var(--ink-2)}
+.matrix-legend span.k{display:inline-flex;align-items:center;gap:6px}
+
+/* timeline */
+.tl svg{display:block;width:100%;height:auto;min-width:780px;font-family:var(--font-ui)}
+.tl-grid{stroke:var(--hair);stroke-width:1}
+.tl-year{fill:var(--muted);font:500 11px var(--font-mono)}
+.tl-thesis{fill:var(--band-thesis)}
+.tl-start{fill:var(--band-start)}
+.tl-today{stroke:var(--ink-2);stroke-width:1}
+.tl-head{fill:var(--ink-2);font-size:11px;font-weight:600;letter-spacing:.06em}
+.tl-sep{stroke:var(--axis);stroke-width:1}
+.tl-name{fill:var(--ink);font-size:12.5px;font-weight:600}
+.tl-type{fill:var(--muted);font-size:11.5px;font-weight:400}
+.tl-who{fill:var(--ink-2);font-size:11px}
+.tl-end{fill:var(--ink-2);font:500 10.5px var(--font-mono)}
+.tl-foot{fill:var(--ink-2);font-size:11.5px;font-weight:600}
+.tl-hit{fill:transparent;cursor:default}
+.tl-hit:hover{fill:var(--accent-wash)}
+.tl-dia{fill:var(--ink);stroke:var(--surface);stroke-width:2}
+.tl-ad{fill:var(--ad);stroke:var(--surface);stroke-width:2}
+.tl-ad-open{fill:var(--good);stroke:var(--surface);stroke-width:2}
+.tl-dot-hit{fill:transparent}
+.tl-note{fill:var(--ink);font-size:11.5px;font-weight:600}
+details.more{margin-top:14px;font-size:13.5px}
+details.more summary{cursor:pointer;color:var(--accent);font-weight:500}
+
+/* data tables */
+table.data{border-collapse:collapse;width:100%;font-size:13.5px}
+.data th,.data td{text-align:left;vertical-align:top;padding:9px 10px;border-bottom:1px solid var(--hair)}
+.data thead th{font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em;border-bottom-color:var(--axis);white-space:nowrap}
+.data .sub{font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.4}
+.data .pi{font-weight:600}
+.pill{display:inline-flex;align-items:center;gap:6px;font-weight:500;white-space:nowrap}
+.pill.muted{color:var(--muted);font-weight:400}
+
+/* filters */
+.filters{display:flex;flex-wrap:wrap;gap:12px 14px;align-items:flex-end;margin-bottom:14px}
+.f{display:grid;gap:4px}
+.f label,.f .lab{font-size:11.5px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.05em}
+.f input[type=search],.f select{height:34px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit;font-size:13.5px;padding:0 10px}
+.f input[type=search]{width:220px}
+.f select{max-width:240px}
+.seg{display:inline-flex;border:1px solid var(--border);border-radius:6px;overflow:hidden;height:34px}
+.seg label{display:inline-flex;align-items:center;gap:5px;padding:0 10px;cursor:pointer;font-size:13px;text-transform:none;letter-spacing:0;font-weight:500;color:var(--ink)}
+.seg label+label{border-left:1px solid var(--border)}
+.seg input{accent-color:var(--accent);margin:0}
+.chk{display:inline-flex;align-items:center;gap:7px;height:34px;font-size:13.5px;cursor:pointer}
+.chk input{accent-color:var(--accent);margin:0}
+.btn{height:34px;border:1px solid var(--border);border-radius:6px;background:transparent;padding:0 12px;cursor:pointer;font-size:13.5px}
+.btn:hover{background:var(--surface-2)}
+.count{font-size:13px;color:var(--ink-2);margin-left:auto;align-self:center}
+@media (max-width:760px){.count{margin-left:0;width:100%}.f input[type=search]{width:100%}.f{flex:1 1 160px}.f select{max-width:none;width:100%}}
+
+table.lookup{min-width:1100px}
+.lookup .pill{white-space:normal}
+.lookup td.c-next{min-width:200px}
+.lookup th button{border:0;background:none;padding:0;cursor:pointer;font:inherit;color:inherit;text-transform:inherit;letter-spacing:inherit;display:inline-flex;gap:4px;align-items:center}
+.lookup th button .ar{font-family:var(--font-mono);color:var(--muted)}
+.lookup td.c-pri{white-space:nowrap}
+.c-pri-in{display:flex;align-items:center;gap:8px}
+.exp{width:24px;height:24px;display:inline-grid;place-items:center;border:1px solid var(--border);border-radius:5px;background:transparent;cursor:pointer;padding:0}
+.exp svg{width:12px;height:12px;transition:transform .15s}
+.exp[aria-expanded="true"] svg{transform:rotate(90deg)}
+tr.row.is-open td{border-bottom-color:transparent;background:var(--surface-2)}
+tr.det td{background:var(--surface-2);padding:4px 16px 16px 46px}
+tr.det dl{display:grid;grid-template-columns:170px 1fr;gap:6px 16px;margin:0;max-width:900px}
+tr.det dt{font-size:12px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;padding-top:1px}
+tr.det dd{margin:0;overflow-wrap:anywhere}
+tr.flash td{animation:flash 1.6s ease-out}
+@keyframes flash{0%,30%{background:var(--accent-wash)}}
+.empty{padding:28px 10px;text-align:center;color:var(--ink-2)}
+.defs{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px 28px;font-size:13px;color:var(--ink-2);margin-top:16px}
+.defs div{display:flex;gap:8px;align-items:baseline}
+.defs .badge{transform:translateY(3px)}
+
+@media (max-width:760px){
+  table.lookup{min-width:0}
+  .lookup thead{display:none}
+  .lookup,.lookup tbody{display:block}
+  .lookup tr.row{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px 14px;padding:14px 4px;border-bottom:1px solid var(--hair)}
+  .lookup tr.row td{display:block;padding:0;border:0}
+  .lookup tr.row td::before{content:attr(data-label);display:block;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);margin-bottom:2px}
+  .lookup tr.row td.c-pri::before{display:none}
+  .lookup td.c-pri,.lookup td.c-pi,.lookup td.c-next{grid-column:1/-1}
+  .lookup .pill{white-space:normal}
+  tr.row.is-open{background:var(--surface-2)}
+  tr.row.is-open td{background:transparent}
+  .lookup tr.det{display:block}
+  .lookup tr.det td{display:block;padding:0 4px 16px}
+  tr.det dl{grid-template-columns:1fr;gap:2px}
+  tr.det dd{margin-bottom:8px}
+}
+
+/* tooltip */
+#tip{position:fixed;z-index:50;max-width:320px;background:var(--ink);color:var(--surface);padding:8px 10px;border-radius:6px;font-size:12.5px;line-height:1.45;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.2)}
+#tip b{display:block;font-weight:600;margin-bottom:2px}
+
+footer{font-size:13px;color:var(--ink-2);display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:18px 32px;border-top:1px solid var(--axis);padding-top:20px}
+footer h3{font-size:12px;text-transform:uppercase;letter-spacing:.06em;margin:0 0 6px;color:var(--ink)}
+footer ul{margin:0;padding-left:18px}
+
+@media (prefers-reduced-motion: reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap" id="app">
+  <header>
+    <p class="eyebrow" id="eyebrow"></p>
+    <h1 id="title"></h1>
+    <p class="lede">Every group, programme and position found so far, arranged by country, research area, hiring signal and open calls. <span id="headline"></span></p>
+    <p class="meta" id="meta"></p>
+  </header>
+
+  <section aria-labelledby="h-next">
+    <h2 id="h-next">Next up</h2>
+    <p class="sub-h">Dated actions, deadlines and calls from the save file, overdue items first.</p>
+    <ol class="next" id="next"></ol>
+    <div class="stats" id="stats"></div>
+  </section>
+
+  <section aria-labelledby="h-sig" id="sig-section">
+    <h2 id="h-sig">How strong is each group's hiring signal?</h2>
+    <p class="sub-h">The <span id="n-tracked"></span> tracked groups and programmes, bucketed by the hiring signal recorded in the scans. Hiring follows project money, so a young grant is the best reason to email. Click a bucket to filter the lookup table.</p>
+    <div class="panel">
+      <div class="sigbar" id="sigbar" role="group" aria-label="Hiring signal buckets"></div>
+      <ul class="legend" id="siglegend"></ul>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-map">
+    <h2 id="h-map">Target map</h2>
+    <p class="sub-h">One chip per group, programme or position. Rows are countries and columns are your research areas, highest priority first. Colour shows the hiring signal, the letter shows priority. Click a chip to open it in the lookup table.</p>
+    <div class="panel">
+      <div class="scroll"><table class="matrix" id="matrix"></table></div>
+      <div class="matrix-legend" id="matrix-legend"></div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-tl">
+    <h2 id="h-tl">Which funding covers your start?</h2>
+    <p class="sub-h">Grants, networks and calls from the scans, with the closing dates of ads, against your current degree and start window. Bars fade where a date isn't pinned down. Hover for details.</p>
+    <div class="panel">
+      <div class="scroll tl" id="timeline"></div>
+      <div class="matrix-legend" id="tl-legend"></div>
+      <details class="more" id="grant-more">
+        <summary>Show grant and call dates as a table</summary>
+        <div class="scroll"><table class="data" id="grant-table" style="min-width:760px;margin-top:10px"></table></div>
+      </details>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-look" id="lookup-section">
+    <h2 id="h-look">Lookup table</h2>
+    <p class="sub-h"><span id="lookup-summary"></span> Filter, sort by any column, and expand a row for the reasoning and sources.</p>
+    <div class="panel">
+      <div class="filters">
+        <div class="f"><label for="f-q">Search</label><input type="search" id="f-q" placeholder="PI, institution, topic"></div>
+        <div class="f"><label for="f-kind">Kind</label><select id="f-kind"></select></div>
+        <div class="f"><label for="f-country">Country</label><select id="f-country"></select></div>
+        <div class="f"><label for="f-area">Research area</label><select id="f-area"></select></div>
+        <div class="f"><label for="f-signal">Hiring signal</label><select id="f-signal"></select></div>
+        <div class="f"><label for="f-pos">Open position</label><select id="f-pos"></select></div>
+        <div class="f"><span class="lab" id="lab-pri">Priority</span>
+          <div class="seg" role="group" aria-labelledby="lab-pri">
+            <label><input type="checkbox" id="f-pri-A" checked> A</label>
+            <label><input type="checkbox" id="f-pri-B" checked> B</label>
+            <label><input type="checkbox" id="f-pri-C" checked> C</label>
+          </div>
+        </div>
+        <label class="chk" id="f-work-wrap" hidden><input type="checkbox" id="f-work"> <span id="f-work-label"></span></label>
+        <label class="chk" id="f-new-wrap" hidden><input type="checkbox" id="f-new"> <span id="f-new-label">New since last scan</span></label>
+        <button type="button" class="btn" data-act="reset">Reset</button>
+        <span class="count" id="count" aria-live="polite"></span>
+      </div>
+      <div class="scroll">
+        <table class="data lookup">
+          <thead><tr id="lookup-head"></tr></thead>
+          <tbody id="lookup-body"></tbody>
+        </table>
+      </div>
+      <div class="defs">
+        <div><span class="badge b-A">A</span><span>Strong fit and eligible, with verified funding or evidence of an active grant.</span></div>
+        <div><span class="badge b-B">B</span><span>Good fit with one open question.</span></div>
+        <div><span class="badge b-C">C</span><span>Weaker fit. Watch list only, not tracked.</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="h-ads">
+    <h2 id="h-ads">Ads seen in the scans</h2>
+    <p class="sub-h" id="ads-summary"></p>
+    <div class="panel"><div class="scroll" id="ads-wrap"><table class="data" id="ads" style="min-width:760px"></table></div></div>
+  </section>
+
+  <section aria-labelledby="h-sch" id="sch-section" hidden>
+    <h2 id="h-sch">External scholarships</h2>
+    <p class="sub-h">Funding applied for separately from a position. Confirm eligibility before counting on one.</p>
+    <div class="panel"><div class="scroll"><table class="data" id="scholarships" style="min-width:760px"></table></div></div>
+  </section>
+
+  <footer>
+    <div>
+      <h3>About this report</h3>
+      <ul id="about"></ul>
+    </div>
+    <div>
+      <h3>Derived columns</h3>
+      <p style="margin:0">"Hiring signal" and "Open position" are buckets built from the recorded signals and ads. The recorded text sits beside each bucket and in the expanded row. Research areas and their order come from your priorities.</p>
+    </div>
+    <div id="reminders-wrap">
+      <h3>Eligibility reminders</h3>
+      <ul id="reminders"></ul>
+    </div>
+  </footer>
+</div>
+<div id="tip" role="tooltip" hidden></div>
+
+<script id="compass-data" type="application/json">__COMPASS_DATA__</script>
+<script>
+// Template: layout, vocabulary and rendering. Content comes from the JSON block above, written by compass.py.
+const DATA = (() => { try { return JSON.parse(document.getElementById("compass-data").textContent); } catch (e) { return null; } })();
+const OK = Boolean(DATA && DATA.meta && Array.isArray(DATA.meta.areas));
+const META = OK ? DATA.meta : {areas:[], start:{from:"2000-01-01", to:"2000-01-01", label:""}};
+const RECORDS = OK ? (DATA.targets || []) : [];
+const ADS = OK ? (DATA.ads || []) : [];
+const GRANTS = OK ? (DATA.grants || []) : [];
+const CALLS = OK ? (DATA.calls || []) : [];
+const SCHOLARSHIPS = OK ? (DATA.scholarships || []) : [];
+const ACTIONS = OK ? (DATA.actions || []) : [];
+
+const REGION_NAMES = (() => { try { return new Intl.DisplayNames(["en"], {type:"region"}); } catch (e) { return null; } })();
+const CC_ALIAS = {uk:"GB", el:"GR"};
+const countryName = cc => {
+  const code = CC_ALIAS[cc] || String(cc || "").toUpperCase();
+  try { const n = REGION_NAMES && REGION_NAMES.of(code); return n || code; } catch (e) { return code; }
+};
+
+const AREAS = [...META.areas].sort((a, b) => a.priority - b.priority);
+const areaLabel = k => (AREAS.find(a => a.key === k) || {label:k}).label;
+
+const SIGNALS = {
+  position:  {label:"Funded position (ad)", rank:0, hollow:true},
+  young:     {label:"Young grant", rank:1},
+  network:   {label:"Network or yearly intake", rank:2},
+  project:   {label:"Active project, funding unclear", rank:3},
+  endsnear:  {label:"Grant ends around the start", rank:4},
+  endsbefore:{label:"Grant ends before the start", rank:5},
+  none:      {label:"No signal found", rank:6},
+  na:        {label:"Not assessed (watch list)", rank:7, hollow:true}
+};
+Object.entries(META.signalLabels || {}).forEach(([k, label]) => { if (SIGNALS[k]) SIGNALS[k].label = label; });
+
+const POSITIONS = {
+  open:     {label:"Open now", rank:0, mark:"pm-open"},
+  upcoming: {label:"Intake coming up", rank:1, mark:"pm-up"},
+  standing: {label:"Standing call", rank:2, mark:"pm-call"},
+  poorfit:  {label:"Open, poor fit", rank:3, mark:"pm-poor"},
+  past:     {label:"Past ad only", rank:4, mark:"pm-past"},
+  none:     {label:"None seen", rank:5, mark:""}
+};
+
+const KINDS = {group:"Groups", programme:"Programmes", position:"Advertised positions", watch:"Watch list"};
+
+const AD_STATUS = {
+  open:{label:"Open", mark:"pm-open"}, closed:{label:"Closed", mark:"pm-past"}, poorfit:{label:"Open, poor fit", mark:"pm-poor"},
+  excluded:{label:"Not eligible", mark:"pm-past"}, offfit:{label:"Off-topic", mark:"pm-past"}, expired:{label:"Expired", mark:"pm-past"}, gone:{label:"Page gone", mark:"pm-past"}
+};
+
+const ELIG = {ok:"Eligible", check:"To check", fail:"Not eligible"};
+const ACTIVE = new Set(["idea","researching","contacted","preparing","submitted","interview","offer"]);
+const ISO = /^\d{4}-\d{2}-\d{2}$/;
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const norm = s => String(s ?? "").toLowerCase().normalize("NFD").replace(/[̀-ͯ]/g, "");
+const parseISO = s => { const [y,m,d] = s.split("-").map(Number); return new Date(y, m-1, d || 1); };
+const TODAY = (() => { const n = new Date(); return new Date(n.getFullYear(), n.getMonth(), n.getDate()); })();
+const daysUntil = s => Math.round((parseISO(s) - TODAY) / 86400000);
+const rel = s => { const n = daysUntil(s); return n === 0 ? "today" : n === 1 ? "tomorrow" : n === -1 ? "yesterday" : n > 1 ? `in ${n} days` : `${-n} days ago`; };
+const plural = (n, one, many) => `${n} ${n === 1 ? one : many}`;
+const listJoin = xs => xs.length < 2 ? xs.join("") : `${xs.slice(0, -1).join(", ")} and ${xs.at(-1)}`;
+const reduceMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const swatch = sig => `<span class="sw${SIGNALS[sig].hollow ? " sw-hollow" : ""}" style="--sw:var(--sig-${sig})"></span>`;
+const tip = (title, ...lines) => esc([title, ...lines.filter(Boolean)].join("|"));
+const safeHref = h => /^(https?:|mailto:|\.{0,2}\/|[\w-]+\/|[\w.-]+\.(md|html|pdf|docx|tex)$)/i.test(String(h || "")) ? h : "#";
+
+// Normalise optional fields so the renderers can trust them.
+RECORDS.forEach(r => {
+  r.tags = Array.isArray(r.tags) ? r.tags : []; r.links = Array.isArray(r.links) ? r.links : []; r.notes = Array.isArray(r.notes) ? r.notes : [];
+  if (!SIGNALS[r.signal]) r.signal = "na";
+  if (!POSITIONS[r.pos]) r.pos = "none";
+  if (r.pos === "open" && r.deadline && daysUntil(r.deadline) < 0) { r.pos = "past"; r.posText = `Closed ${r.deadline}`; }
+});
+ADS.forEach(a => { a.dates = Array.isArray(a.dates) ? a.dates.filter(d => ISO.test(d)) : []; if (!AD_STATUS[a.status]) a.status = "closed"; });
+const tracked = RECORDS.filter(r => r.kind !== "watch");
+const signalled = RECORDS.filter(r => r.kind === "group" || r.kind === "programme");
+// "New" means first seen after the previous scan; with a single scan nothing is flagged.
+const isNew = x => Boolean(META.previousScan && x.added && x.added > META.previousScan);
+const newTag = x => isNew(x) ? ` <span class="new-tag">new</span>` : "";
+
+function renderHeader(){
+  $("title").textContent = META.title;
+  $("eyebrow").textContent = META.eyebrow || ["PhD search", META.field, META.start.detail || META.start.label].filter(Boolean).join(" · ");
+  $("headline").textContent = META.headline || "";
+  const scan = META.lastScan ? `Latest scan: <span class="mono">${esc(META.lastScan)}</span>` : "No scan yet";
+  $("meta").innerHTML = `Built from the phd-compass save file${META.owner ? ` of ${esc(META.owner)}` : ""}. ${scan}; save file updated <span class="mono">${esc(META.updated)}</span>. Days left count from the day you open this page.`;
+  const about = [
+    `Save file updated <span class="mono">${esc(META.updated)}</span>`,
+    META.lastScan ? `Latest scan <span class="mono">${esc(META.lastScan)}</span>${META.previousScan ? `, previous <span class="mono">${esc(META.previousScan)}</span>` : ""}` : "No scan recorded yet",
+    `Start window: ${esc(META.start.detail || `${META.start.from} to ${META.start.to}`)}`,
+    "Rebuild with <code>compass.py report</code> after the save file changes"
+  ];
+  $("about").innerHTML = about.map(x => `<li>${x}</li>`).join("");
+  const reminders = META.reminders || [];
+  $("reminders").innerHTML = reminders.map(r => `<li>${esc(r)}</li>`).join("");
+  $("reminders-wrap").hidden = reminders.length === 0;
+  $("n-tracked").textContent = signalled.length;
+  $("sig-section").hidden = signalled.length === 0;
+  const kc = k => RECORDS.filter(r => r.kind === k).length;
+  const parts = [[kc("group"), "group", "groups"], [kc("programme"), "programme", "programmes"], [kc("position"), "advertised position", "advertised positions"], [kc("watch"), "watch-list group", "watch-list groups"]]
+    .filter(p => p[0]).map(p => plural(...p));
+  $("lookup-summary").textContent = RECORDS.length ? `All ${RECORDS.length} entries: ${listJoin(parts)}.` : "No entries yet.";
+  const openAds = ADS.filter(a => a.status === "open" && a.dates.some(d => daysUntil(d) >= 0)).length;
+  $("ads-summary").textContent = ADS.length
+    ? `Every in-scope ad found across the scans, newest first. ${openAds === 0 ? "None is open right now." : openAds === 1 ? "One is open and fits." : `${openAds} are open and fit.`}`
+    : "No ads recorded yet.";
+  if (META.previousScan) { $("f-new-wrap").hidden = false; $("f-new-label").textContent = `New since ${META.previousScan}`; }
+  if (META.workPreference) { $("f-work-wrap").hidden = false; $("f-work-label").textContent = `Only ${META.workPreference} work`; }
+}
+
+function datedItems(){
+  const items = [];
+  RECORDS.forEach(t => {
+    if (!ACTIVE.has(t.status)) return;
+    const who = `${t.id} ${t.short}`;
+    if (t.nextDate && ISO.test(t.nextDate)) items.push({date:t.nextDate, type:"action", what:`${who}: ${t.next || "next action"}`});
+    if (t.deadline && ISO.test(t.deadline) && (t.kind === "position" || t.kind === "programme")) items.push({date:t.deadline, type:"deadline", what:`${who}: application deadline, ${t.inst}`});
+  });
+  SCHOLARSHIPS.forEach(s => { if (["idea","checking","preparing"].includes(s.status) && ISO.test(s.deadline)) items.push({date:s.deadline, type:"deadline", what:`Scholarship deadline: ${s.name}`}); });
+  CALLS.forEach(c => (c.milestones || []).forEach(m => { if (ISO.test(m.date)) items.push({date:m.date, type:"call", shown:m.shown, what:`${c.name}: ${m.label}`}); }));
+  ACTIONS.forEach(a => { if (!a.done && ISO.test(a.date)) items.push({date:a.date, type:"action", what:a.what}); });
+  return items.sort((a, b) => a.date.localeCompare(b.date));
+}
+
+function renderNext(){
+  const warn = `<svg class="ico-warn" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1 11.2 10.5H.8Z" fill="var(--warn)"/><path d="M6 4.6v2.6M6 8.6v.1" stroke="#1a1300" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+  const all = datedItems();
+  const overdue = all.filter(i => i.type !== "call" && daysUntil(i.date) < 0);
+  const upcoming = all.filter(i => daysUntil(i.date) >= 0).slice(0, Math.max(4, 10 - overdue.length));
+  const items = [...overdue, ...upcoming];
+  $("next").innerHTML = items.length ? items.map(n => {
+    const d = daysUntil(n.date), late = d < 0, cls = late || d <= 7 ? "soon" : "";
+    const r = late ? `${warn}<span>Overdue · ${rel(n.date)}</span>` : (d <= 7 ? warn : "") + `<span>${n.shown ? "about " : ""}${rel(n.date)}</span>`;
+    return `<li class="${cls}"><span class="when">${esc(n.shown || n.date)}</span><span class="rel">${r}</span><span class="what">${esc(n.what)}</span></li>`;
+  }).join("") : `<li><span class="what">Nothing dated yet. Actions, deadlines and calls appear here once targets are recorded.</span></li>`;
+}
+
+function renderStats(){
+  const open = RECORDS.filter(r => r.pos === "open");
+  const a = tracked.filter(r => r.pri === "A").length, b = tracked.filter(r => r.pri === "B").length;
+  const byC = {}; RECORDS.forEach(r => byC[r.cc] = (byC[r.cc] || 0) + 1);
+  const counts = Object.entries(byC).sort((x, y) => y[1] - x[1]);
+  const top = counts.length ? counts.filter(c => c[1] === counts[0][1]) : [];
+  const countryNote = !counts.length ? "None yet"
+    : top.length === counts.length ? `${plural(counts[0][1], "entry", "entries")} each`
+    : `Most entries: ${top.map(c => countryName(c[0])).join(", ")} (${counts[0][1]})`;
+  const young = signalled.filter(r => r.signal === "young");
+  const stats = [
+    {v:tracked.length, l:"Tracked targets", s:`${a} priority A · ${b} priority B`},
+    {v:open.length, l:open.length === 1 ? "Open position" : "Open positions", s:open.length ? open.map(r => r.deadline ? `${r.short}, closes ${r.deadline} (${rel(r.deadline)})` : `${r.short}, no closing date`).join("; ") : "None open right now"},
+    {v:young.length, l:"With a young grant", s:young.length ? young.map(r => r.short).join(", ") : "None recorded"},
+    {v:Object.keys(byC).length, l:"Countries", s:countryNote},
+    {v:RECORDS.filter(r => r.kind === "watch").length, l:"Watch-list groups (C)", s:"Weaker fit, not tracked"},
+    {v:ADS.length, l:"Ads seen in the scans", s:`${ADS.filter(x => x.status !== "open").length} closed, off-topic or not eligible`}
+  ];
+  if (SCHOLARSHIPS.length) stats.push({v:SCHOLARSHIPS.length, l:"External scholarships", s:`${SCHOLARSHIPS.filter(s => s.eligible === "yes").length} eligible · ${SCHOLARSHIPS.filter(s => s.eligible === "check").length} to check`});
+  if (META.previousScan) {
+    const fresh = RECORDS.filter(isNew);
+    stats.unshift({v:fresh.length, l:`New since ${META.previousScan}`, s:fresh.length ? fresh.map(r => r.short).join(", ") : "No new entries"});
+  }
+  $("stats").innerHTML = stats.map(s => `<div class="stat"><div class="v">${s.v}</div><div class="l">${esc(s.l)}</div><div class="s">${esc(s.s)}</div></div>`).join("");
+}
+
+function renderSignalBar(){
+  const keys = ["young","network","project","endsnear","endsbefore","none"];
+  const counts = keys.map(k => ({k, n:signalled.filter(r => r.signal === k)})).filter(c => c.n.length);
+  const bar = $("sigbar");
+  bar.classList.toggle("filtered", keys.includes(state.signal));
+  bar.innerHTML = counts.map(c => `<button type="button" data-signal="${c.k}" class="${state.signal === c.k ? "on" : ""}" style="flex:${c.n.length} 1 0;--sw:var(--sig-${c.k})" aria-label="${esc(SIGNALS[c.k].label)}: ${c.n.length}" data-tip="${tip(`${SIGNALS[c.k].label} · ${c.n.length}`, c.n.map(r => r.short).join(", "))}"></button>`).join("");
+  $("siglegend").innerHTML = counts.map(c => `<li><button type="button" data-signal="${c.k}">${swatch(c.k)}<span>${esc(SIGNALS[c.k].label)}</span><span class="n">${c.n.length}</span></button></li>`).join("");
+}
+
+function chip(r){
+  const p = POSITIONS[r.pos];
+  const marks = {open:"open", upcoming:"upcoming", standing:"call", poorfit:"open, poor fit"};
+  const mark = marks[r.pos] ? `<span class="pm ${p.mark}"></span><span class="pm-t">${marks[r.pos]}</span>` : "";
+  const t = tip(`${r.pi}`, `${r.inst}`, r.topic, `Signal: ${SIGNALS[r.signal].label}`, `Position: ${p.label}`);
+  return `<button type="button" class="chip pri-${esc(r.pri)}" data-focus="${esc(r.key)}" data-tip="${t}" aria-label="${esc(r.pi)}, priority ${esc(r.pri)}, ${esc(SIGNALS[r.signal].label)}. Show in lookup table">${swatch(r.signal)}<span class="badge b-${esc(r.pri)}">${esc(r.pri)}</span><span class="nm">${esc(r.short)}</span>${mark}${newTag(r)}</button>`;
+}
+
+function renderMatrix(){
+  const byC = {};
+  RECORDS.forEach(r => (byC[r.cc] ||= []).push(r));
+  const rows = Object.entries(byC).sort((a, b) => b[1].length - a[1].length || countryName(a[0]).localeCompare(countryName(b[0])));
+  const order = (x, y) => String(x.pri).localeCompare(String(y.pri)) || SIGNALS[x.signal].rank - SIGNALS[y.signal].rank || String(x.short).localeCompare(String(y.short));
+  const areaCount = k => RECORDS.filter(r => r.area === k).length;
+  $("matrix").style.minWidth = `${150 + AREAS.length * 150}px`;
+  let html = `<thead><tr><th scope="col">Country</th>${AREAS.map(a => `<th scope="col">${esc(a.label)}<span class="cnt">${areaCount(a.key)}</span></th>`).join("")}</tr></thead><tbody>`;
+  rows.forEach(([cc, list]) => {
+    html += `<tr><th scope="row">${esc(countryName(cc))}<span class="cc">${esc(cc)}</span><span class="cnt">${list.length}</span></th>`;
+    AREAS.forEach(a => { html += `<td><div class="cell">${list.filter(r => r.area === a.key).sort(order).map(chip).join("")}</div></td>`; });
+    html += `</tr>`;
+  });
+  if (!rows.length) html += `<tr><td colspan="${AREAS.length + 1}" class="empty">No entries yet. Run a scan to fill the map.</td></tr>`;
+  $("matrix").innerHTML = html + `</tbody>`;
+  $("matrix-legend").innerHTML =
+    Object.keys(SIGNALS).map(k => `<span class="k">${swatch(k)}${esc(SIGNALS[k].label)}</span>`).join("") +
+    `<span class="k"><span class="badge b-A">A</span><span class="badge b-B">B</span><span class="badge b-C">C</span>Priority</span>` +
+    Object.values(POSITIONS).filter(p => p.mark && p.mark !== "pm-past").map(p => `<span class="k"><span class="pm ${p.mark}"></span>${esc(p.label)}</span>`).join("");
+}
+
+function timelineRange(){
+  if (META.timeline && ISO.test(META.timeline.from) && ISO.test(META.timeline.to)) return [META.timeline.from, META.timeline.to];
+  const dates = [META.start.from, META.start.to];
+  if (META.degreeEnd) dates.push(META.degreeEnd.from);
+  GRANTS.forEach(g => dates.push(g.start));
+  CALLS.forEach(c => { if (c.from) dates.push(c.from); (c.milestones || []).forEach(m => dates.push(m.date)); });
+  ADS.forEach(a => dates.push(...a.dates));
+  const years = dates.filter(d => ISO.test(d)).map(d => +d.slice(0, 4));
+  const startYear = +META.start.to.slice(0, 4);
+  const from = Math.max(Math.min(...years, TODAY.getFullYear()), startYear - 6);
+  return [`${from}-01-01`, `${startYear + 1}-07-01`];
+}
+
+function renderTimeline(){
+  if (!GRANTS.length && !CALLS.length && !ADS.some(a => a.dates.length)) {
+    $("timeline").innerHTML = `<p class="note">Nothing dated yet. Grants, calls and ad closing dates appear here after a scan.</p>`;
+    $("tl-legend").innerHTML = ""; $("grant-more").hidden = true;
+    return;
+  }
+  const [F, T] = timelineRange();
+  const W = 1040, X0 = 250, X1 = 982, LANE = 38, HEAD = 30, TOP = 30, FOOT = 34;
+  const D0 = parseISO(F).getTime(), D1 = parseISO(T).getTime();
+  const midDate = (a, b) => new Date((parseISO(a).getTime() + parseISO(b).getTime()) / 2);
+  const x = d => +(X0 + Math.max(0, Math.min(1, ((typeof d === "string" ? parseISO(d) : d).getTime() - D0) / (D1 - D0))) * (X1 - X0)).toFixed(1);
+  const grants = GRANTS.filter(g => g.kind !== "recruit"), recruit = GRANTS.filter(g => g.kind === "recruit");
+  const rows = [];
+  if (grants.length) rows.push({head:"GRANTS AND PROJECTS"}, ...grants.map(g => ({g})));
+  if (recruit.length) rows.push({head:"NETWORKS AND PROGRAMMES RECRUITING"}, ...recruit.map(g => ({g})));
+  if (CALLS.length) rows.push({head:"CALLS AND INTAKES"}, ...CALLS.map(c => ({c})));
+  if (ADS.some(a => a.dates.length)) rows.push({head:"ADS SEEN IN THE SCANS (CLOSING DATES)"}, {ads:true});
+  let y = TOP;
+  rows.forEach(r => { r.y = y; y += r.head ? HEAD : LANE; });
+  const bottom = y, H = y + FOOT;
+  let defs = "", back = "", lanes = "", hits = "", front = "";
+
+  for (let yr = new Date(D0 - 1).getFullYear() + 1; parseISO(`${yr}-01-01`).getTime() < D1; yr++) {
+    const gx = x(`${yr}-01-01`);
+    back += `<line class="tl-grid" x1="${gx}" x2="${gx}" y1="${TOP - 8}" y2="${bottom}"/><text class="tl-year" x="${gx + 4}" y="${TOP - 13}">${yr}</text>`;
+  }
+  const band = (a, b, cls) => `<rect class="${cls}" x="${x(a)}" y="${TOP - 8}" width="${Math.max(0, x(b) - x(a)).toFixed(1)}" height="${bottom - TOP + 8}"/>`;
+  back = (META.degreeEnd ? band(META.degreeEnd.from, META.degreeEnd.to, "tl-thesis") : "") + band(META.start.from, META.start.to, "tl-start") + back;
+  const clip = (s, n) => { s = String(s || ""); return s.length > n ? s.slice(0, n - 2).trimEnd() + "…" : s; };
+
+  rows.forEach((r, i) => {
+    const mid = r.y + LANE / 2;
+    const lab = (name, type, who) => `<text x="0" y="${mid - 3}"><tspan class="tl-name">${esc(clip(name, 26))}</tspan><tspan class="tl-type" dx="6">${esc(clip(type, 22))}</tspan></text><text class="tl-who" x="0" y="${mid + 11}">${esc(clip(who, 40))}</text>`;
+    if (r.head) {
+      lanes += `<text class="tl-head" x="0" y="${r.y + 20}">${esc(r.head)}</text><line class="tl-sep" x1="0" x2="${W}" y1="${r.y + 26}" y2="${r.y + 26}"/>`;
+      return;
+    }
+    if (r.g) {
+      const g = r.g, sig = SIGNALS[g.sig] ? g.sig : "none";
+      const xs = x(g.start), xe = Math.max(xs + 2, x(g.end)), thin = g.kind === "recruit", h = thin ? 6 : 12;
+      let fill = `style="fill:var(--sig-${sig})"`;
+      if (g.fadeIn || g.fadeOut) {
+        const off = d => Math.max(0, Math.min(1, (x(d) - xs) / (xe - xs))).toFixed(3);
+        const stops = [];
+        if (g.fadeIn) stops.push([0, .2], [off(g.fadeIn), 1]); else stops.push([0, 1]);
+        if (g.fadeOut) stops.push([off(g.fadeOut), 1], [1, 0]); else stops.push([1, 1]);
+        defs += `<linearGradient id="fade-${i}" gradientUnits="userSpaceOnUse" x1="${xs}" x2="${xe}" y1="0" y2="0">${stops.map(s => `<stop offset="${s[0]}" style="stop-color:var(--sig-${sig});stop-opacity:${s[1]}"/>`).join("")}</linearGradient>`;
+        fill = `fill="url(#fade-${i})"`;
+      }
+      lanes += lab(g.name, g.type, g.who);
+      lanes += `<rect x="${xs}" y="${mid - h / 2}" width="${(xe - xs).toFixed(1)}" height="${h}" rx="3" ${fill}/>`;
+      if (g.endLabel) lanes += `<text class="tl-end" x="${Math.min(xe + 6, W - 50)}" y="${mid + 4}">${esc(g.endLabel)}</text>`;
+      hits += `<rect class="tl-hit" x="0" y="${r.y + 1}" width="${W}" height="${LANE - 2}" data-tip="${tip(`${g.name} · ${g.type}`, `Dates: ${g.recorded}`, `Who: ${g.who}`, `Recruiting: ${g.recruiting}`, `Signal: ${SIGNALS[sig].label}`)}"/>`;
+      return;
+    }
+    if (r.c) {
+      const c = r.c;
+      lanes += lab(c.name, c.type, c.who);
+      if (c.from && ISO.test(c.from)) {
+        const xs = x(c.from), xe = X1;
+        defs += `<linearGradient id="fade-call-${i}" gradientUnits="userSpaceOnUse" x1="${xs}" x2="${xe}" y1="0" y2="0"><stop offset="0" style="stop-color:var(--ink-2);stop-opacity:1"/><stop offset="1" style="stop-color:var(--ink-2);stop-opacity:0"/></linearGradient>`;
+        lanes += `<rect x="${xs}" y="${mid - 2}" width="${Math.max(0, xe - xs).toFixed(1)}" height="4" rx="2" fill="url(#fade-call-${i})"/>`;
+      }
+      (c.milestones || []).filter(m => ISO.test(m.date)).forEach(m => {
+        const cx = x(m.date);
+        lanes += `<rect class="tl-dia" x="${cx - 5}" y="${mid - 5}" width="10" height="10" transform="rotate(45 ${cx} ${mid})"/>`;
+        hits += `<circle class="tl-dot-hit" cx="${cx}" cy="${mid}" r="11" data-tip="${tip(m.label, m.shown || m.date, c.recorded, `Source: ${c.name}`)}"/>`;
+      });
+      return;
+    }
+    if (r.ads) {
+      lanes += `<text x="0" y="${mid - 3}"><tspan class="tl-name">Ad deadlines</tspan></text><text class="tl-who" x="0" y="${mid + 11}">Dated ads only</text>`;
+      const pts = [];
+      ADS.forEach(a => a.dates.forEach(d => pts.push({a, d})));
+      pts.sort((p, q) => p.d.localeCompare(q.d));
+      let lastX = -99, flip = false, labelled = false;
+      pts.forEach(p => {
+        const cx = x(p.d);
+        flip = cx - lastX < 12 ? !flip : false;
+        const cy = mid + (flip ? 10 : 0);
+        lastX = cx;
+        const open = p.a.status === "open" && daysUntil(p.d) >= 0;
+        lanes += `<circle class="${open ? "tl-ad-open" : "tl-ad"}" cx="${cx}" cy="${cy}" r="${open ? 6 : 5}"/>`;
+        if (open && !labelled && cx < X1 - 200) { lanes += `<text class="tl-note" x="${cx + 11}" y="${cy + 4}">Open: ${esc(p.a.org || "ad")}, closes ${p.d}</text>`; labelled = true; }
+        hits += `<circle class="tl-dot-hit" cx="${cx}" cy="${cy}" r="10" data-tip="${tip(p.a.title, `${open ? "Closes" : "Closed"} ${p.d}`, p.a.note, `Via ${p.a.src}`)}"/>`;
+      });
+    }
+  });
+
+  if (TODAY.getTime() >= D0 && TODAY.getTime() <= D1) {
+    const tx = x(TODAY);
+    front += `<line class="tl-today" x1="${tx}" x2="${tx}" y1="${TOP - 8}" y2="${bottom + 6}"/>`;
+    front += `<text class="tl-foot" x="${tx}" y="${bottom + 22}" text-anchor="end" dx="-4">Today</text>`;
+  }
+  if (META.degreeEnd) front += `<text class="tl-foot" x="${x(midDate(META.degreeEnd.from, META.degreeEnd.to))}" y="${bottom + 22}" text-anchor="middle" data-tip="${tip(META.degreeEnd.label, META.degreeEnd.detail)}">Degree</text>`;
+  front += `<text class="tl-foot" x="${x(midDate(META.start.from, META.start.to))}" y="${bottom + 22}" text-anchor="middle" data-tip="${tip(META.start.label, META.start.detail)}">Start</text>`;
+
+  $("timeline").innerHTML = `<svg viewBox="0 0 ${W} ${H}" role="img" aria-label="Timeline ${F.slice(0, 4)} to ${T.slice(0, 4)} of grants, calls and ad closing dates, against the current degree and the target start window"><defs>${defs}</defs>${back}${lanes}${front}${hits}</svg>`;
+
+  $("tl-legend").innerHTML = ["young","network","project","endsnear","endsbefore","none"].filter(k => GRANTS.some(g => g.sig === k)).map(k => `<span class="k">${swatch(k)}${esc(SIGNALS[k].label)}</span>`).join("") +
+    (ADS.length ? `<span class="k"><svg width="12" height="12" aria-hidden="true"><circle cx="6" cy="6" r="4.5" style="fill:var(--ad)"/></svg>Ad closing date</span><span class="k"><span class="pm pm-open"></span>Open ad</span>` : "") +
+    (CALLS.length ? `<span class="k"><svg width="12" height="12" aria-hidden="true"><rect x="2.5" y="2.5" width="7" height="7" transform="rotate(45 6 6)" style="fill:var(--ink)"/></svg>Call milestone</span>` : "") +
+    `<span class="k"><span class="sw" style="--sw:var(--band-start);box-shadow:inset 0 0 0 1px var(--border)"></span>Degree and start windows</span>`;
+
+  $("grant-table").innerHTML = `<thead><tr><th>Name</th><th>Type</th><th>Who</th><th>Dates as recorded</th><th>Recruiting?</th><th>Signal</th></tr></thead><tbody>` +
+    GRANTS.map(g => `<tr><td><a href="${esc(safeHref(g.link))}" target="_blank" rel="noopener">${esc(g.name)}</a></td><td>${esc(g.type)}</td><td>${esc(g.who)}</td><td class="mono">${esc(g.recorded)}</td><td>${esc(g.recruiting)}</td><td>${SIGNALS[g.sig] ? `<span class="pill">${swatch(g.sig)}${esc(SIGNALS[g.sig].label)}</span>` : "—"}</td></tr>`).join("") +
+    CALLS.map(c => `<tr><td><a href="${esc(safeHref(c.link))}" target="_blank" rel="noopener">${esc(c.name)}</a></td><td>${esc(c.type)}</td><td>${esc(c.who)}</td><td class="mono">${esc(c.recorded)}</td><td>${esc(c.recruiting)}</td><td>—</td></tr>`).join("") + `</tbody>`;
+}
+
+const STORE = "phd-compass:filters:" + norm(META.title).replace(/[^a-z0-9]+/g, "-");
+const defaults = () => ({q:"", kind:"", country:"", area:"", signal:"", pos:"", pri:{A:true, B:true, C:true}, work:false, newOnly:false, sort:{key:"pri", dir:1}});
+let state = defaults();
+const openRows = new Set();
+try { const saved = JSON.parse(localStorage.getItem(STORE) || "null"); if (saved) state = Object.assign(defaults(), saved, {pri:Object.assign({A:true,B:true,C:true}, saved.pri)}); } catch (e) {}
+const save = () => { try { localStorage.setItem(STORE, JSON.stringify(state)); } catch (e) {} };
+
+function matches(r){
+  if (state.kind && r.kind !== state.kind) return false;
+  if (state.country && r.cc !== state.country) return false;
+  if (state.area && r.area !== state.area && !r.tags.includes(state.area)) return false;
+  if (state.signal && r.signal !== state.signal) return false;
+  if (state.pos === "any") { if (!["open","upcoming","standing","poorfit"].includes(r.pos)) return false; }
+  else if (state.pos && r.pos !== state.pos) return false;
+  if (!state.pri[r.pri]) return false;
+  if (state.work && META.workPreference && r.work !== "yes") return false;
+  if (state.newOnly && !isNew(r)) return false;
+  if (state.q) {
+    const hay = norm([r.id, r.short, r.pi, r.group, r.inst, r.topic, countryName(r.cc)].join(" "));
+    if (!hay.includes(norm(state.q.trim()))) return false;
+  }
+  return true;
+}
+
+const cmpStr = (a, b) => String(a ?? "").localeCompare(String(b ?? ""));
+const SORTS = {
+  pri:    (a, b) => cmpStr(a.pri, b.pri) || SIGNALS[a.signal].rank - SIGNALS[b.signal].rank || cmpStr(a.short, b.short),
+  pi:     (a, b) => cmpStr(a.short, b.short),
+  inst:   (a, b) => cmpStr(a.inst, b.inst),
+  cc:     (a, b) => countryName(a.cc).localeCompare(countryName(b.cc)) || cmpStr(a.pri, b.pri),
+  area:   (a, b) => AREAS.findIndex(x => x.key === a.area) - AREAS.findIndex(x => x.key === b.area) || cmpStr(a.pri, b.pri),
+  signal: (a, b) => SIGNALS[a.signal].rank - SIGNALS[b.signal].rank || cmpStr(a.pri, b.pri),
+  pos:    (a, b) => POSITIONS[a.pos].rank - POSITIONS[b.pos].rank || cmpStr(a.pri, b.pri),
+  next:   (a, b) => (a.nextDate || "9999").localeCompare(b.nextDate || "9999") || cmpStr(a.pri, b.pri)
+};
+const COLS = [["pri","Pri"],["pi","PI, group or programme"],["inst","Institution"],["cc","Country"],["area","Research area"],["signal","Hiring signal"],["pos","Open position"],["next","Next step"]];
+
+function buildControls(){
+  const count = f => RECORDS.filter(f).length;
+  $("f-kind").innerHTML = `<option value="">All kinds</option>` + Object.entries(KINDS).filter(([k]) => count(r => r.kind === k)).map(([k, l]) => `<option value="${k}">${esc(l)} (${count(r => r.kind === k)})</option>`).join("");
+  const cOpts = [...new Set(RECORDS.map(r => r.cc))].map(cc => [cc, countryName(cc), count(r => r.cc === cc)]).sort((a, b) => a[1].localeCompare(b[1]));
+  $("f-country").innerHTML = `<option value="">All countries</option>` + cOpts.map(([cc, n, c]) => `<option value="${esc(cc)}">${esc(n)} (${c})</option>`).join("");
+  $("f-area").innerHTML = `<option value="">All areas</option>` + AREAS.map(a => `<option value="${esc(a.key)}">${esc(a.label)} (${count(r => r.area === a.key || r.tags.includes(a.key))})</option>`).join("");
+  $("f-signal").innerHTML = `<option value="">All signals</option>` + Object.entries(SIGNALS).map(([k, s]) => `<option value="${k}">${esc(s.label)} (${count(r => r.signal === k)})</option>`).join("");
+  const anyN = count(r => ["open","upcoming","standing","poorfit"].includes(r.pos));
+  $("f-pos").innerHTML = `<option value="">Any</option><option value="any">Any current or coming opening (${anyN})</option>` + Object.entries(POSITIONS).map(([k, p]) => `<option value="${k}">${esc(p.label)} (${count(r => r.pos === k)})</option>`).join("");
+}
+
+function syncControls(){
+  $("f-q").value = state.q; $("f-kind").value = state.kind; $("f-country").value = state.country; $("f-area").value = state.area;
+  $("f-signal").value = state.signal; $("f-pos").value = state.pos; $("f-work").checked = state.work; $("f-new").checked = state.newOnly;
+  ["A","B","C"].forEach(p => $("f-pri-" + p).checked = state.pri[p]);
+}
+
+function posCell(r){
+  const p = POSITIONS[r.pos];
+  const text = r.pos === "open" && r.deadline ? `Closes ${r.deadline} (${rel(r.deadline)})` : r.posText;
+  return `<span class="pill${r.pos === "none" ? " muted" : ""}">${p.mark ? `<span class="pm ${p.mark}"></span>` : ""}${esc(p.label)}</span>${r.pos === "none" || !text ? "" : `<div class="sub">${esc(text)}</div>`}`;
+}
+
+function nextCell(r){
+  let h = `<div>${esc(r.next || (r.kind === "watch" ? "Watch list" : "—"))}</div>`;
+  if (r.nextDate) h += `<div class="sub mono">${esc(r.nextDate)} · ${rel(r.nextDate)}</div>`;
+  if (r.question) h += `<div class="sub">Open question: ${esc(r.question)}</div>`;
+  return h;
+}
+
+function detailRow(r){
+  const dd = (t, v) => v ? `<dt>${t}</dt><dd>${v}</dd>` : "";
+  const funding = r.funding ? `${esc(r.funding)} · ${r.fundingVerified ? "verified" : "unverified"}` : "";
+  const elig = r.eligibility ? `${esc(ELIG[r.eligibility.status] || r.eligibility.status)}${r.eligibility.notes ? `: ${esc(r.eligibility.notes)}` : ""}` : "";
+  return `<tr class="det" id="det-${esc(r.key)}"><td colspan="8"><dl>
+    ${dd("Research", esc(r.topic))}
+    ${dd(r.pri === "C" ? "Why watch list only" : "Why it fits", esc(r.why))}
+    ${dd("Open question", esc(r.question))}
+    ${dd("Funding", funding)}
+    ${dd("Eligibility", elig)}
+    ${dd("Hiring signal, as recorded", esc(r.signalText))}
+    ${dd("Position, as recorded", esc(r.posText))}
+    ${dd("Preferred work type", META.workPreference ? ({yes:"Yes", partly:"Partly", no:"No"}[r.work] || "") : "")}
+    ${dd("Also tagged", r.tags.map(areaLabel).map(esc).join(", "))}
+    ${dd("Notes", r.notes.map(esc).join("<br>"))}
+    ${dd("Tracker", r.kind === "watch" ? "Not tracked (watch list)" : `${esc(r.id)} · ${esc(r.type || KINDS[r.kind] || r.kind)} · status ${esc(r.status)}`)}
+    ${dd("Report", r.report ? `<a href="${esc(safeHref(r.report))}" target="_blank" rel="noopener">${esc(r.report)}</a>` : "")}
+    ${dd("Sources", r.links.map(l => `<a href="${esc(safeHref(l.href))}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>${l.accessed ? ` <span class="mono">(${esc(l.accessed)})</span>` : ""}`).join(" · "))}
+  </dl></td></tr>`;
+}
+
+function renderTable(){
+  $("lookup-head").innerHTML = COLS.map(([k, label]) => {
+    const on = state.sort.key === k;
+    return `<th scope="col" aria-sort="${on ? (state.sort.dir > 0 ? "ascending" : "descending") : "none"}"><button type="button" data-sort="${k}">${label}<span class="ar">${on ? (state.sort.dir > 0 ? "↑" : "↓") : ""}</span></button></th>`;
+  }).join("");
+  const cmp = SORTS[state.sort.key] || SORTS.pri;
+  const rows = RECORDS.filter(matches).sort((a, b) => cmp(a, b) * state.sort.dir);
+  const chev = `<svg viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  $("lookup-body").innerHTML = rows.length ? rows.map(r => {
+    const open = openRows.has(r.key);
+    return `<tr class="row${open ? " is-open" : ""}" id="row-${esc(r.key)}">
+      <td class="c-pri" data-label="Priority"><div class="c-pri-in"><button type="button" class="exp" data-toggle="${esc(r.key)}" aria-expanded="${open}" aria-controls="det-${esc(r.key)}" aria-label="Details for ${esc(r.pi)}">${chev}</button><span class="badge b-${esc(r.pri)}" title="Priority ${esc(r.pri)}">${esc(r.pri)}</span><span class="cc">${esc(r.id || "—")}</span></div></td>
+      <td class="c-pi" data-label="PI, group or programme"><div class="pi">${esc(r.pi)}${newTag(r)}</div><div class="sub">${esc(r.group)}</div></td>
+      <td data-label="Institution">${esc(r.inst)}</td>
+      <td data-label="Country">${esc(countryName(r.cc))} <span class="cc">${esc(r.cc)}</span></td>
+      <td data-label="Research area">${esc(areaLabel(r.area))}${r.tags.length ? `<div class="sub">+ ${r.tags.map(areaLabel).map(esc).join(", ")}</div>` : ""}</td>
+      <td data-label="Hiring signal"><span class="pill">${swatch(r.signal)}${esc(SIGNALS[r.signal].label)}</span>${r.signalText ? `<div class="sub">${esc(r.signalText)}</div>` : ""}</td>
+      <td data-label="Open position">${posCell(r)}</td>
+      <td class="c-next" data-label="Next step">${nextCell(r)}</td>
+    </tr>${open ? detailRow(r) : ""}`;
+  }).join("") : `<tr><td colspan="8" class="empty">${RECORDS.length ? `No entries match these filters. <button type="button" class="btn" data-act="reset">Reset filters</button>` : "No entries yet."}</td></tr>`;
+  $("count").textContent = `Showing ${rows.length} of ${RECORDS.length}`;
+}
+
+function renderAds(){
+  if (!ADS.length) { $("ads-wrap").innerHTML = `<p class="note">No ads recorded yet.</p>`; return; }
+  const sorted = [...ADS].sort((a, b) => (b.dates.at(-1) || b.added || "0").localeCompare(a.dates.at(-1) || a.added || "0"));
+  $("ads").innerHTML = `<thead><tr><th>Ad</th><th>Country</th><th>Closing date</th><th>Status</th><th>Note</th></tr></thead><tbody>` +
+    sorted.map(a => {
+      const s = AD_STATUS[a.status];
+      const dates = a.dates.length ? a.dates.join(", ") : "—";
+      const extra = a.status === "open" && a.dates[0] ? `<div class="sub">${rel(a.dates[0])}</div>` : "";
+      return `<tr><td><a href="${esc(safeHref(a.link))}" target="_blank" rel="noopener">${esc(a.title)}</a>${newTag(a)}<div class="sub">via ${esc(a.src)}${a.added ? ` · first seen <span class="mono">${esc(a.added)}</span>` : ""}</div></td><td>${esc(countryName(a.cc))} <span class="cc">${esc(a.cc)}</span></td><td class="mono">${dates}${extra}</td><td><span class="pill${a.status === "open" ? "" : " muted"}"><span class="pm ${s.mark}"></span>${esc(s.label)}</span></td><td>${esc(a.note || "")}</td></tr>`;
+    }).join("") + `</tbody>`;
+}
+
+function renderScholarships(){
+  if (!SCHOLARSHIPS.length) return;
+  $("sch-section").hidden = false;
+  const E = {yes:"Eligible", no:"Not eligible", check:"To check"};
+  $("scholarships").innerHTML = `<thead><tr><th>Scheme</th><th>Eligible?</th><th>Covers</th><th>Deadline</th><th>Status</th><th>Note</th></tr></thead><tbody>` +
+    SCHOLARSHIPS.map(s => {
+      const d = ISO.test(s.deadline) ? `${esc(s.deadline)}<div class="sub">${rel(s.deadline)}</div>` : esc(s.deadline);
+      return `<tr><td><a href="${esc(safeHref(s.link))}" target="_blank" rel="noopener">${esc(s.name)}</a><div class="sub">${esc(s.funder)}</div></td><td>${esc(E[s.eligible] || s.eligible)}</td><td>${esc(s.covers)}</td><td class="mono">${d}</td><td>${esc(s.status)}</td><td>${esc(s.note || "")}</td></tr>`;
+    }).join("") + `</tbody>`;
+}
+
+function update(){ save(); renderSignalBar(); renderTable(); }
+
+function scrollToTable(el){
+  (el || $("lookup-section")).scrollIntoView({behavior: reduceMotion ? "auto" : "smooth", block: el ? "center" : "start"});
+}
+
+function focusRecord(key){
+  const r = RECORDS.find(x => x.key === key);
+  if (!r) return;
+  state = Object.assign(defaults(), {q: r.short});
+  openRows.add(key);
+  syncControls(); update();
+  const row = $("row-" + key);
+  if (row) { scrollToTable(row); row.classList.add("flash"); setTimeout(() => row.classList.remove("flash"), 1700); }
+}
+
+function wire(){
+  document.addEventListener("click", e => {
+    const t = e.target.closest("[data-focus],[data-toggle],[data-sort],[data-signal],[data-act]");
+    if (!t) return;
+    if (t.dataset.focus) focusRecord(t.dataset.focus);
+    else if (t.dataset.toggle) { const k = t.dataset.toggle; openRows.has(k) ? openRows.delete(k) : openRows.add(k); renderTable(); const b = document.querySelector(`[data-toggle="${CSS.escape(k)}"]`); if (b) b.focus(); }
+    else if (t.dataset.sort) { const k = t.dataset.sort; state.sort = state.sort.key === k ? {key:k, dir:-state.sort.dir} : {key:k, dir:1}; update(); const b = document.querySelector(`[data-sort="${k}"]`); if (b) b.focus(); }
+    else if (t.dataset.signal) { const k = t.dataset.signal; state.signal = state.signal === k ? "" : k; syncControls(); update(); if (state.signal) scrollToTable(); }
+    else if (t.dataset.act === "reset") { state = defaults(); openRows.clear(); syncControls(); update(); }
+  });
+  [["f-q","input","q"],["f-kind","change","kind"],["f-country","change","country"],["f-area","change","area"],["f-signal","change","signal"],["f-pos","change","pos"]].forEach(([id, ev, key]) =>
+    $(id).addEventListener(ev, e => { state[key] = e.target.value; update(); }));
+  ["A","B","C"].forEach(p => $("f-pri-" + p).addEventListener("change", e => { state.pri[p] = e.target.checked; update(); }));
+  $("f-work").addEventListener("change", e => { state.work = e.target.checked; update(); });
+  $("f-new").addEventListener("change", e => { state.newOnly = e.target.checked; update(); });
+
+  // Tooltip: one element, content from data-tip ("Title|line|line").
+  const tipEl = $("tip");
+  function showTip(target, cx, cy){
+    const parts = target.getAttribute("data-tip").split("|");
+    tipEl.innerHTML = `<b>${esc(parts[0])}</b>${parts.slice(1).map(esc).join("<br>")}`;
+    tipEl.hidden = false;
+    const w = tipEl.offsetWidth, h = tipEl.offsetHeight;
+    let left = cx + 14, top = cy + 16;
+    if (left + w > window.innerWidth - 8) left = Math.max(8, cx - w - 14);
+    if (top + h > window.innerHeight - 8) top = Math.max(8, cy - h - 12);
+    tipEl.style.left = left + "px"; tipEl.style.top = top + "px";
+  }
+  document.addEventListener("pointermove", e => {
+    const t = e.target.closest && e.target.closest("[data-tip]");
+    if (t) showTip(t, e.clientX, e.clientY); else tipEl.hidden = true;
+  });
+  document.addEventListener("focusin", e => {
+    const t = e.target.closest && e.target.closest("[data-tip]");
+    if (t) { const b = t.getBoundingClientRect(); showTip(t, b.left, b.bottom); } else tipEl.hidden = true;
+  });
+  document.addEventListener("scroll", () => { tipEl.hidden = true; }, {passive:true});
+}
+
+if (OK) {
+  renderHeader(); buildControls(); syncControls(); wire();
+  renderNext(); renderStats(); renderSignalBar(); renderMatrix(); renderTimeline(); renderTable(); renderAds(); renderScholarships();
+} else {
+  document.title = "phd-compass report template";
+  $("app").innerHTML = `<p class="empty">This is the phd-compass report template. Build a report from a save file with <code>compass.py report phd-compass.md</code>.</p>`;
+}
+</script>
+</body>
+</html>
