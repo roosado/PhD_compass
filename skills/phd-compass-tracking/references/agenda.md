@@ -30,3 +30,5 @@ A short agenda:
 - **Later in the window**
 - **Gaps** (from step 2)
 - **The three most important actions**, each with a date and why it comes first (a hard deadline beats a soft follow-up; a referee needs lead time).
+
+If confirmed deadlines fall inside the window, offer calendar reminders as `references/calendar.md` describes: through a calendar connector when this environment has one, otherwise as an `.ics` file.
