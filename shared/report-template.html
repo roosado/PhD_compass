@@ -485,6 +485,7 @@ function renderStats(){
   const counts = Object.entries(byC).sort((x, y) => y[1] - x[1]);
   const top = counts.length ? counts.filter(c => c[1] === counts[0][1]) : [];
   const countryNote = !counts.length ? "None yet"
+    : counts.length === 1 ? `${counts[0][1] === 1 ? "The only entry is" : `All ${counts[0][1]} entries are`} in ${countryName(counts[0][0])}`
     : top.length === counts.length ? `${plural(counts[0][1], "entry", "entries")} each`
     : `Most entries: ${top.map(c => countryName(c[0])).join(", ")} (${counts[0][1]})`;
   const young = signalled.filter(r => r.signal === "young");
@@ -492,7 +493,7 @@ function renderStats(){
     {v:tracked.length, l:"Tracked targets", s:`${a} priority A · ${b} priority B`},
     {v:open.length, l:open.length === 1 ? "Open position" : "Open positions", s:open.length ? open.map(r => r.deadline ? `${r.short}, closes ${r.deadline} (${rel(r.deadline)})` : `${r.short}, no closing date`).join("; ") : "None open right now"},
     {v:young.length, l:"With a young grant", s:young.length ? young.map(r => r.short).join(", ") : "None recorded"},
-    {v:Object.keys(byC).length, l:"Countries", s:countryNote},
+    {v:Object.keys(byC).length, l:counts.length === 1 ? "Country" : "Countries", s:countryNote},
     {v:RECORDS.filter(r => r.kind === "watch").length, l:"Watch-list groups (C)", s:"Weaker fit, not tracked"},
     {v:ADS.length, l:"Ads seen in the scans", s:`${ADS.filter(x => x.status !== "open").length} closed, off-topic or not eligible`}
   ];
@@ -587,7 +588,8 @@ function renderTimeline(){
 
   rows.forEach((r, i) => {
     const mid = r.y + LANE / 2;
-    const lab = (name, type, who) => `<text x="0" y="${mid - 3}"><tspan class="tl-name">${esc(clip(name, 26))}</tspan><tspan class="tl-type" dx="6">${esc(clip(type, 22))}</tspan></text><text class="tl-who" x="0" y="${mid + 11}">${esc(clip(who, 40))}</text>`;
+    // Labels stay left of X0: the name alone on the first line, "type · who" on the second.
+    const lab = (name, type, who) => `<text class="tl-name" x="0" y="${mid - 3}">${esc(clip(name, 30))}</text><text class="tl-who" x="0" y="${mid + 11}">${esc(clip([type, who].filter(Boolean).join(" · "), 42))}</text>`;
     if (r.head) {
       lanes += `<text class="tl-head" x="0" y="${r.y + 20}">${esc(r.head)}</text><line class="tl-sep" x1="0" x2="${W}" y1="${r.y + 26}" y2="${r.y + 26}"/>`;
       return;
@@ -606,7 +608,12 @@ function renderTimeline(){
       }
       lanes += lab(g.name, g.type, g.who);
       lanes += `<rect x="${xs}" y="${mid - h / 2}" width="${(xe - xs).toFixed(1)}" height="${h}" rx="3" ${fill}/>`;
-      if (g.endLabel) lanes += `<text class="tl-end" x="${Math.min(xe + 6, W - 50)}" y="${mid + 4}">${esc(g.endLabel)}</text>`;
+      if (g.endLabel) {
+        const room = W - (xe + 6) >= String(g.endLabel).length * 6.5;
+        lanes += room
+          ? `<text class="tl-end" x="${xe + 6}" y="${mid + 4}">${esc(g.endLabel)}</text>`
+          : `<text class="tl-end" x="${xe}" y="${mid - h / 2 - 3}" text-anchor="end">${esc(g.endLabel)}</text>`;
+      }
       hits += `<rect class="tl-hit" x="0" y="${r.y + 1}" width="${W}" height="${LANE - 2}" data-tip="${tip(`${g.name} · ${g.type}`, `Dates: ${g.recorded}`, `Who: ${g.who}`, `Recruiting: ${g.recruiting}`, `Signal: ${SIGNALS[sig].label}`)}"/>`;
       return;
     }
