@@ -5,6 +5,7 @@ institution: TODO
 country: TODO         # two-letter code
 group_url: TODO
 profile: TODO         # Google Scholar, ORCID or OpenAlex link
+contact: TODO         # the PI's email, if the group or staff page lists it
 tracker_id: TODO      # e.g. T004
 fit: TODO             # 1–5
 funding: TODO         # verified source and amount, or "unverified"

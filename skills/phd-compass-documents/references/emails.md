@@ -7,6 +7,9 @@ A short email that a busy PI can answer in one line. Template: `assets/email.md`
 - **About an ad:** a practical question the ad leaves open (start date, eligibility, degree timing), sent well before the deadline.
 - **Before a programme application:** in fields and countries where contacting faculty first is normal (US/Canada, supervisor-first systems), to ask whether they expect to take students.
 
+## Quick draft from existing research
+When the target already has a report (folder mode) or Target notes (chat mode), draft from those alone, with no new searching: the hook from its recent papers, the ask from its open positions and hiring signals, the bridge from its fit assessment, the address from its `contact`. A missing piece, or research more than about 3 months old, becomes `TODO` in the draft, and you tell the owner which pieces are missing. Offer a fresh research run only if they ask for it. A target with no report or notes needs researching first (the core skill's target research).
+
 ## Rules
 - **200 words or fewer** in the body. One screen, no scrolling.
 - **The hook is real and specific:** a recent paper, a project or the ad itself, linked in the checklist with an access date. Summarise it in the owner's words; do not flatter.

@@ -9,7 +9,7 @@ Done when you know the full name, institution, group or programme URL, and wheth
 
 ## 2. Research
 Use `references/sources.md`:
-- The group or programme website: members, research lines, facilities, open positions, how to apply.
+- The group or programme website: members, research lines, facilities, open positions, how to apply. Note the PI's email if the page lists it: a later email draft uses it instead of a fresh lookup.
 - The last ~3 years of papers (Google Scholar, OpenAlex, the preprint server). Pick the 3–5 most relevant to the owner's areas.
 - Grants: the region's grant database and CORDIS. Record the funder, title, start and end dates.
 - The position ad or programme's admissions and funding pages, if any: funding, duration, start, requirements, documents, deadline.
@@ -24,7 +24,7 @@ Apply the fit judgement in `references/ranking-eligibility.md` (score 1–5, str
 
 ## 4. Record
 - **Folder mode:** write `targets/<cc>_<institution>_<surname-or-programme>.md` from `assets/target-report.md`, and set the target's `report` field to that path.
-- **Chat mode:** add 5–10 lines under **Target notes** in the save file: tracker ID and name, fit score with the strongest match and the biggest weakness, funding and its source, eligibility result, 2–3 key papers (linked), the open question, the recommended move.
+- **Chat mode:** add 5–10 lines under **Target notes** in the save file: tracker ID and name, the PI's email if found, fit score with the strongest match and the biggest weakness, funding and its source, eligibility result, 2–3 key papers (linked), the open question, the recommended move.
 - Update the target's data entry: priority, signal, position, funding and `fundingVerified`, eligibility, `why`, `question`, `status: "researching"`, next action and date, links with access dates.
 - Run `sync`.
 
