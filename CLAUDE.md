@@ -8,4 +8,5 @@ Shareable Claude skills for PhD searches: `skills/phd-compass` (core) and three 
 - Frontmatter keys allowed on claude.ai: `name`, `description`, `license`, `allowed-tools`, `metadata`, `compatibility`. Description on one line, 1024 characters or fewer, no angle brackets. Skills must not rely on Claude Code-only features (`$ARGUMENTS`, `argument-hint`).
 - Bump `version` in `.claude-plugin/plugin.json` and every skill's `metadata.version` together.
 - Region notes hold structural facts with a source and access date; never add stipends, fees or deadlines there.
+- After changing `compass.py serve` or the report's Pipeline tab, test by hand: serve a copy of `examples/sample-save-file.md` (`--port`, `--no-browser`), then star, log, edit and delete in a browser, and log from the command line while the page is open (the page's next save must keep that entry).
 - Commit after each finished change, with a message that says what changed.
