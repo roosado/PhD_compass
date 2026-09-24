@@ -39,7 +39,7 @@ The core skill works on its own. The add-ons read the same save file, and docume
 
 ### Claude Code
 ```
-/plugin marketplace add roosado/PhD_compass
+/plugin marketplace add <this repository's GitHub URL or local path>
 /plugin install phd-compass@phd-compass
 ```
 Then start a session in an empty folder for your search and say, for example, "Here's my CV (cv.pdf). Help me find a funded PhD."
