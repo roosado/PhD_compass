@@ -2,6 +2,8 @@
 
 Each event changes the data block (the target's status and next action) and one Markdown section. Ask for any detail below that the owner did not give; dates are always absolute.
 
+Record the data-block side with `scripts/compass.py log <save> <ID> <type> --by owner` (types in `references/save-file.md`: `emailed`, `followup`, `reply-yes`, `reply-no`, `reply-other`, `meeting`, `applied`, `interview`, `offer`, `accepted`, `rejected`, `withdrawn`, `closed`, `note`). It stars the target, puts the event in the report's Pipeline tab, and lets `sync` set the status and next action below; adjust `next` by hand only where the owner agreed a different step.
+
 | Event | Data block (the target) | Markdown |
 |---|---|---|
 | Email sent | `status: "contacted"` if earlier; `next` = follow up, `nextDate` = sent date + 10–14 days | Outreach row: `sent`, follow-up date |

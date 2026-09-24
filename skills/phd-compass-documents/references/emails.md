@@ -26,6 +26,6 @@ When the target already has a report (folder mode) or Target notes (chat mode), 
 - **Replies:** positive (propose a call, ask about the application route and funding); redirected (thank them, record the new contact as a target); negative (thank them in two lines, ask whether they know a group looking for students, and record it).
 
 ## Record
-Add the draft to the save file's Outreach table (`drafted`, no follow-up date). When the owner reports it sent, set `sent`, the follow-up date, and the target's `status: "contacted"` with `next`/`nextDate` for the follow-up.
+Add the draft to the save file's Outreach table (`drafted`, no follow-up date), and log it for the report's Pipeline tab: `scripts/compass.py log <save> <ID> drafted --note "Subject: <subject>" --link <draft path>` (this also stars the target). When the owner reports it sent, log `emailed` with `--by owner`, and set `sent`, the follow-up date, and the target's `status: "contacted"` with `next`/`nextDate` for the follow-up.
 
 Done when the draft passes the template's checklist and is logged.

@@ -1,6 +1,6 @@
 ---
 name: phd-compass-tracking
-description: Track PhD applications end to end - what is due, submissions, outreach follow-ups, referee letters, scholarship applications, materials readiness and calendar reminders - in a phd-compass.md save file. Use when someone asks what is due or what to do next in their PhD applications, records that they submitted an application or sent an email, got a reply, an interview invitation, an offer or a rejection, needs to ask referees for letters, or wants PhD deadlines in their calendar.
+description: Track PhD applications end to end - what is due, submissions, outreach follow-ups, referee letters, scholarship applications, materials readiness and calendar reminders - in a phd-compass.md save file. Use when someone asks what is due or what to do next in their PhD applications, records that they submitted an application or sent an email, got a reply, an interview invitation, an offer or a rejection, needs to ask referees for letters, or wants PhD deadlines in their calendar, or wants to open their report to star targets and log what they did.
 license: MIT
 metadata:
   version: "1.0.1"
@@ -30,11 +30,12 @@ Run `validate`. Fix any errors before going on (they are usually a malformed dat
 | ask referees for letters, or check on them | `references/referees.md` |
 | track an external scholarship application | `references/scholarships.md` |
 | put deadlines in a calendar | `references/calendar.md` |
+| open the report to star targets and log actions, star or unstar a target, or says they updated the report site | `references/pipeline.md` |
 
 Several can run in one session; do the agenda last so it reflects the updates.
 
 ## 3. Finish
-1. Run `sync`, then `report --out <path>` (folder mode: `phd-compass-report.html` beside the save file; chat mode: the outputs folder).
+1. Run `sync`, then `report --out <path>` (folder mode: `phd-compass-report.html` beside the save file, plus `launcher <save>` so `open-report.cmd` / `open-report.sh` stay current; chat mode: the outputs folder).
 2. Tell the owner what changed, in a few lines, and the next three actions with dates.
 3. In chat mode, present the updated save file and report for download.
 

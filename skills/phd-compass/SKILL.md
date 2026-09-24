@@ -51,9 +51,9 @@ Follow `references/ranking-eligibility.md` for keep / maybe / drop, priority A /
 Follow `references/target-research.md` when the owner names a PI, group, programme, position link or tracker ID, or after a scan for the strongest targets.
 
 ## 8. Render and hand over
-1. `sync`, then `report --out <path>` (folder mode: `phd-compass-report.html` beside the save file; chat mode: the outputs folder).
+1. `sync`, then `report --out <path>` (folder mode: `phd-compass-report.html` beside the save file, plus `launcher <save>`, which writes `open-report.cmd` / `open-report.sh` for opening the report with an editable Pipeline tab; chat mode: the outputs folder).
 2. Set `meta.headline` to one or two sentences on the state of the search before rendering.
 3. Present the report and, in chat mode, the save file, with a reminder to keep the save file and upload it next time.
-4. Close with at most three next actions. Mention the add-on skills where they fit: `phd-compass-documents` (tailored CV, letters, proposals, professor emails, critique), `phd-compass-interviews` (preparation and mock interviews) and `phd-compass-tracking` (deadlines, submissions, referees). They are installed separately.
+4. Close with at most three next actions. Mention the add-on skills where they fit: `phd-compass-documents` (tailored CV, letters, proposals, professor emails, critique), `phd-compass-interviews` (preparation and mock interviews) and `phd-compass-tracking` (deadlines, submissions, referees, and the Pipeline tab: starring targets and logging what the owner did). They are installed separately.
 
 Done when both files exist at the stated paths, `validate` shows no errors, and the owner has the next actions.
