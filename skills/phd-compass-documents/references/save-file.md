@@ -23,6 +23,7 @@ No save file uploaded or found? Ask whether they have one before starting fresh:
 | `report <save> --out <file>` | Validate, then build the self-contained HTML report (only in `phd-compass` and `phd-compass-tracking`, which ship the report template) |
 | `agenda <save> --days N` | Overdue and upcoming dated items from the data block, plus gaps |
 | `next-id <save>` | The next free tracker ID |
+| `log <save> <ID> <type> [--date --note --follow-up --link --by]` | Star the target, add a pipeline log entry (below), then `sync`. `--by` is `claude` unless the owner did it |
 
 Every command takes `--today YYYY-MM-DD`; pass today's date if the sandbox clock might differ from the conversation's date.
 
@@ -89,6 +90,8 @@ A JSON object between `<!-- data:start -->` and `<!-- data:end -->`. After `sync
 | `notes` | List of short strings |
 | `links` | `[{href, label, accessed}]`, sources for the claims above |
 | `report` | Path to the full report (folder mode) |
+| `researched` | Date of the latest in-depth research; research older than 90 days is flagged for a refresh |
+| `starred` | `true` puts the target in the report's Pipeline tab. Unstarring keeps its log |
 | `added` | Date first recorded |
 
 ### `ads` (every in-scope ad seen, kept or dropped)
@@ -105,6 +108,31 @@ A JSON object between `<!-- data:start -->` and `<!-- data:end -->`. After `sync
 
 ### `actions` (dated to-dos not tied to one target)
 `date`, `what`, `done`.
+
+### `log` (the pipeline: what the owner did for each target, and when)
+One entry per event, one line each: `id` (8 hex characters), `key` (the target), `date`, `type`, `note`, `followUp` (date to follow up or check back by, or `null`), `by` (`owner` or `claude`), `link` (optional: a draft or file). Record events with `compass.py log`, so the ID, the star and the sync happen together; `compass.py serve` writes the owner's own entries.
+
+| `type` | Stage in the Pipeline tab | Target `status` set by `sync` |
+|---|---|---|
+| `drafted` | Email drafted | unchanged |
+| `emailed`, `followup` | Waiting for reply | `contacted` |
+| `reply-yes`, `reply-other`, `meeting` | In conversation | `contacted` |
+| `reply-no` | Declined | `contacted` |
+| `preparing` · `applied` · `interview` · `offer` · `accepted` | same name | `preparing` · `submitted` · `interview` · `offer` · `accepted` |
+| `rejected` · `withdrawn` · `closed` | Closed | same name |
+| `note` | unchanged | unchanged |
+
+For every target with a logged stage, `sync` sets `status` from the latest entry that carries one, and `next`/`nextDate` from these rules (a target with no logged stage keeps its own next action):
+
+| Stage | Next step | Due (the latest entry's `followUp` overrides) |
+|---|---|---|
+| Email drafted | Send the drafted email | 3 days after the draft |
+| Waiting for reply | Follow up; after 2 follow-ups, close it or write to another group member | 14 days after the last email |
+| In conversation | Apply formally, or ask about the application route | 7 days on |
+| Declined | Close it, or ask about another route | 7 days on |
+| Preparing · Applied · Interview · Offer | Submit (by the ad deadline) · wait for the outcome · prepare · decide | follow-up date |
+
+Before the application, the report adds: "Apply by <deadline>" for an open ad (the main step when it is sooner), and a refresh step when `researched` is missing or older than 90 days.
 
 ### Example target line
 ```json

@@ -156,7 +156,8 @@ Status values: TODO · in progress · ready · needs update
   "grants": [],
   "calls": [],
   "scholarships": [],
-  "actions": []
+  "actions": [],
+  "log": []
 }
 ```
 <!-- data:end -->

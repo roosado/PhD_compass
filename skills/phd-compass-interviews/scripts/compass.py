@@ -14,14 +14,19 @@ Commands (every command accepts --today YYYY-MM-DD; default: the system date):
                                           validate, then build the self-contained HTML report
   agenda <save.md> [--days N]             overdue and upcoming dated items, plus gaps
   next-id <save.md>                       the next free tracker ID
+  log <save.md> <ID|key> <type> [--date D] [--note T] [--follow-up D] [--link L] [--by owner|claude]
+                                          star a target, add an entry to its pipeline log, then sync
 """
 
 import argparse
 import datetime as dt
 import html
 import json
+import os
 import re
+import secrets
 import sys
+import tempfile
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -48,8 +53,22 @@ SCH_ELIGIBLE = {"yes", "no", "check"}
 SCH_STATUS = {"idea", "checking", "preparing", "submitted", "awarded", "rejected", "not-eligible"}
 SCH_OPEN = {"idea", "checking", "preparing"}
 SCH_DEADLINE_WORDS = {"rolling", "unknown", "varies"}
-LISTS = ("targets", "ads", "grants", "calls", "scholarships", "actions")
+LISTS = ("targets", "ads", "grants", "calls", "scholarships", "actions", "log")
 HORIZON_DAYS = 60
+
+# Pipeline log: entry type -> (stage, tracker status it sets; None leaves the status alone).
+ENTRY_TYPES = {
+    "drafted": ("drafted", None), "emailed": ("waiting", "contacted"), "followup": ("waiting", "contacted"),
+    "reply-yes": ("talking", "contacted"), "reply-other": ("talking", "contacted"),
+    "reply-no": ("declined", "contacted"), "meeting": ("talking", "contacted"),
+    "preparing": ("preparing", "preparing"), "applied": ("applied", "submitted"),
+    "interview": ("interview", "interview"), "offer": ("offer", "offer"), "accepted": ("accepted", "accepted"),
+    "rejected": ("closed", "rejected"), "withdrawn": ("closed", "withdrawn"), "closed": ("closed", "closed"),
+    "note": (None, None),
+}
+LOG_BY = {"owner", "claude"}
+FOLLOW_UP_DAYS, STALE_RESEARCH_DAYS, SEND_DRAFT_DAYS, MAX_FOLLOW_UPS = 14, 90, 3, 2
+EARLY_STAGES = {"starred", "drafted", "waiting", "talking", "declined", "preparing"}
 
 
 # ---------------------------------------------------------------- loading
@@ -302,6 +321,9 @@ def validate(data, today):
         notes = t.get("notes", [])
         if not isinstance(notes, list) or not all(isinstance(x, str) for x in notes):
             f.err(w, "'notes' must be a list of strings")
+        if not isinstance(t.get("starred", False), bool):
+            f.err(w, "'starred' must be true or false")
+        check_date(f, w, t, "researched", required=False, nullable=True)
 
         # Rules that are judgement calls: warn, never block.
         if kind in ("position", "programme") and pri == "A" and fv is not True:
@@ -405,6 +427,29 @@ def validate(data, today):
         check_str(f, w, a, "what")
         if not isinstance(a.get("done", False), bool):
             f.err(w, "'done' must be true or false")
+
+    entry_ids = set()
+    for i, e in enumerate(data.get("log", [])):
+        w = f"log[{i}]"
+        if not isinstance(e, dict):
+            f.err(w, "must be an object")
+            continue
+        eid = check_str(f, w, e, "id")
+        if eid in entry_ids:
+            f.err(w, f"duplicate id {eid!r}")
+        entry_ids.add(eid)
+        key = check_str(f, w, e, "key")
+        if key and key not in keys:
+            f.warn(w, f"'key' {key!r} matches no target (removed from the search?)")
+        check_date(f, w, e, "date")
+        check_enum(f, w, e, "type", set(ENTRY_TYPES))
+        check_str(f, w, e, "note", required=False)
+        check_date(f, w, e, "followUp", required=False, nullable=True)
+        check_enum(f, w, e, "by", LOG_BY)
+        check_str(f, w, e, "link", required=False)
+        extra = set(e) - {"id", "key", "date", "type", "note", "followUp", "by", "link"}
+        if extra:
+            f.err(w, f"unknown fields {sorted(extra)}")
     return f
 
 
@@ -426,6 +471,104 @@ def load_valid(path, today):
     if f.errors:
         sys.exit(1)
     return text, data, m
+
+
+# ---------------------------------------------------------------- pipeline
+
+def add_days(iso, n):
+    return (dt.date.fromisoformat(iso) + dt.timedelta(days=n)).isoformat()
+
+
+def target_entries(data, key):
+    return sorted((e for e in data.get("log", []) if e.get("key") == key), key=lambda e: (e["date"], e["id"]))
+
+
+def pipeline_state(t, entries, today):
+    """Stage and next steps for one target from its log. The report shows the result; sync writes it to next/nextDate.
+
+    The stage comes from the latest entry whose type has a stage; the latest entry's followUp, if set, overrides the
+    due date. Before any logged step the target keeps its own next action. Before applying, an open ad adds
+    "apply by <deadline>" (the main step when sooner) and research older than 90 days adds a refresh step.
+    """
+    staged = [e for e in entries if ENTRY_TYPES[e["type"]][0]]
+    last, latest = (staged[-1] if staged else None), (entries[-1] if entries else None)
+    stage = ENTRY_TYPES[last["type"]][0] if last else "starred"
+    who = t.get("short") or t.get("pi")
+    main = None
+    if stage == "starred":
+        main = {"text": t.get("next") or "Decide the first step", "due": t.get("nextDate")}
+    elif stage == "drafted":
+        main = {"text": "Send the drafted email", "due": add_days(last["date"], SEND_DRAFT_DAYS)}
+    elif stage == "waiting":
+        sent = 0
+        for e in reversed(staged):
+            if ENTRY_TYPES[e["type"]][0] != "waiting":
+                break
+            sent += 1
+        if sent > MAX_FOLLOW_UPS:
+            main = {"text": f"No reply after {MAX_FOLLOW_UPS} follow-ups: close it, or write to another group member",
+                    "due": add_days(last["date"], FOLLOW_UP_DAYS)}
+        else:
+            main = {"text": "Follow up" if sent == 1 else "Send another follow-up",
+                    "ask": f"Draft a follow-up email to {who}", "due": add_days(last["date"], FOLLOW_UP_DAYS)}
+    elif stage == "talking":
+        main = {"text": "Apply formally, or ask about the application route", "due": add_days(last["date"], 7)}
+    elif stage == "declined":
+        main = {"text": "Close it, or ask about another route (a graduate school or doctoral network)",
+                "due": add_days(last["date"], 7)}
+    elif stage == "preparing":
+        main = {"text": "Submit the application", "due": t.get("deadline")}
+    elif stage == "applied":
+        main = {"text": "Wait for the outcome", "due": None}
+    elif stage == "interview":
+        main = {"text": "Prepare the interview", "ask": f"Prepare me for the interview with {who}", "due": None}
+    elif stage == "offer":
+        main = {"text": "Decide on the offer", "due": None}
+    if main and stage != "starred" and latest and latest.get("followUp"):
+        main["due"] = latest["followUp"]
+
+    extras = []
+    if stage in EARLY_STAGES and stage != "preparing" and t.get("pos") == "open" and t.get("deadline") \
+            and t["deadline"] >= today.isoformat():
+        if not main.get("due") or t["deadline"] < main["due"]:
+            extras.append(main)
+            main = {"text": f"Apply by {t['deadline']}", "due": t["deadline"]}
+        else:
+            extras.append({"text": f"Ad closes {t['deadline']}"})
+    if stage in EARLY_STAGES and stage != "starred":
+        if not t.get("researched"):
+            extras.append({"text": "Not researched in depth yet", "ask": f"Research {who} in depth"})
+        elif days_between(today, t["researched"]) < -STALE_RESEARCH_DAYS:
+            extras.append({"text": f"Research is {-days_between(today, t['researched'])} days old: refresh it",
+                           "ask": f"Refresh the research on {who}"})
+    return {"stage": stage, "main": main, "extras": extras}
+
+
+def apply_pipeline(data, today):
+    """Set status, next and nextDate of every target with a logged step, following its log."""
+    for t in data.get("targets", []):
+        entries = target_entries(data, t.get("key"))
+        staged = [e for e in entries if ENTRY_TYPES[e["type"]][0]]
+        if not staged:
+            continue
+        with_status = [e for e in staged if ENTRY_TYPES[e["type"]][1]]
+        if with_status and t.get("kind") != "watch":
+            t["status"] = ENTRY_TYPES[with_status[-1]["type"]][1]
+        state = pipeline_state(t, entries, today)
+        if state["main"]:
+            t["next"], t["nextDate"] = state["main"]["text"], state["main"].get("due")
+        elif t.get("status") not in ACTIVE:
+            t["nextDate"] = None
+
+
+def pipeline_view(data, today):
+    """Per-target pipeline state for the report: starred targets and any target with log entries."""
+    out = {}
+    for t in data.get("targets", []):
+        entries = target_entries(data, t.get("key"))
+        if t.get("starred") or entries:
+            out[t["key"]] = pipeline_state(t, entries, today)
+    return out
 
 
 # ---------------------------------------------------------------- dated items
@@ -555,30 +698,79 @@ def dump_data(data):
     return "{\n" + "\n".join(parts) + "\n}"
 
 
-def cmd_sync(args, today):
-    path = Path(args.save)
-    text, data, m = load_valid(path, today)
+def synced_text(text, data, m, today, quiet=False):
+    """The save file text with the pipeline applied, the data block canonical and the generated sections rebuilt."""
+    apply_pipeline(data, today)
     data.setdefault("meta", {})["updated"] = today.isoformat()
     text = text[:m.start(1)] + dump_data(data) + text[m.end(1):]
     for name, gen in GENERATED.items():
         pat = re.compile(rf"(<!-- {name}:start -->)(.*?)(<!-- {name}:end -->)", re.S)
         if not pat.search(text):
-            print(f"warning: marker <!-- {name}:start --> not found; that section was not regenerated")
+            if not quiet:
+                print(f"warning: marker <!-- {name}:start --> not found; that section was not regenerated")
             continue
         body = gen(data, today)
         text = pat.sub(lambda mm: f"{mm.group(1)}\n{body}\n{mm.group(3)}", text, count=1)
-    text = re.sub(r"(?m)^- Last updated: .*$", lambda _: f"- Last updated: {today.isoformat()}", text, count=1)
-    write_text(path, text)
+    return re.sub(r"(?m)^- Last updated: .*$", lambda _: f"- Last updated: {today.isoformat()}", text, count=1)
+
+
+def write_atomic(path, text):
+    """Write via a temporary file in the same folder, so a crash never leaves a half-written save file."""
+    path = Path(path)
+    fd, tmp = tempfile.mkstemp(dir=str(path.parent), prefix=".compass-", suffix=".tmp")
+    try:
+        with os.fdopen(fd, "w", encoding="utf-8", newline="\n") as f:
+            f.write(text)
+        os.replace(tmp, str(path))
+    except BaseException:
+        if os.path.exists(tmp):
+            os.remove(tmp)
+        raise
+
+
+def cmd_sync(args, today):
+    path = Path(args.save)
+    text, data, m = load_valid(path, today)
+    write_atomic(path, synced_text(text, data, m, today))
     n = len([t for t in data.get("targets", []) if t.get("kind") != "watch"])
     print(f"Synced {path}: {n} tracked target(s), {len(data.get('scholarships', []))} scholarship(s).")
 
 
+def cmd_log(args, today):
+    path = Path(args.save)
+    text, data, m = load_valid(path, today)
+    want = args.target
+    t = next((t for t in data.get("targets", []) if t.get("key") == want.lower() or (t.get("id") or "").upper() == want.upper()), None)
+    if not t:
+        fail(f"no target with key or id {want!r}")
+    for d in (args.date, args.follow_up):
+        if d and not is_iso(d):
+            fail(f"dates must be YYYY-MM-DD, got {d!r}")
+    t["starred"] = True
+    entry = {"id": secrets.token_hex(4), "key": t["key"], "date": args.date or today.isoformat(), "type": args.type,
+             "note": args.note or "", "followUp": args.follow_up, "by": args.by}
+    if args.link:
+        entry["link"] = args.link
+    data.setdefault("log", []).append(entry)
+    data["log"].sort(key=lambda e: (e["date"], e["id"]))
+    f = validate(data, today)
+    if f.errors:
+        print_findings(f, path)
+        sys.exit(1)
+    write_atomic(path, synced_text(text, data, m, today))
+    print(f"Logged {args.type} for {t.get('id') or t['key']} ({t.get('short')}) on {entry['date']}; "
+          f"status {t.get('status')}, next: {t.get('next')} ({t.get('nextDate') or 'no date'}).")
+
+
 # ---------------------------------------------------------------- report
 
-def cmd_report(args, today):
-    path = Path(args.save)
-    _, data, _ = load_valid(path, today)
-    template = Path(args.template) if args.template else ASSETS / "report-template.html"
+def report_payload(data, today):
+    """The data the report embeds: the data block plus each pipeline target's computed stage and next steps."""
+    return dict(data, pipeline=pipeline_view(data, today))
+
+
+def render_report(data, today, template=None):
+    template = Path(template) if template else ASSETS / "report-template.html"
     if not template.exists():
         fail(f"report template not found at {template}. The phd-compass and phd-compass-tracking skills include it.")
     page = template.read_text(encoding="utf-8")
@@ -586,9 +778,15 @@ def cmd_report(args, today):
         if token not in page:
             fail(f"{template} has no {token} placeholder")
     # "<" is escaped so no string in the data can close the <script> element.
-    payload = json.dumps(data, ensure_ascii=False).replace("<", "\\u003c")
+    payload = json.dumps(report_payload(data, today), ensure_ascii=False).replace("<", "\\u003c")
     page = page.replace("__COMPASS_TITLE__", html.escape(data["meta"]["title"]))
-    page = page.replace("__COMPASS_DATA__", payload)
+    return page.replace("__COMPASS_DATA__", payload)
+
+
+def cmd_report(args, today):
+    path = Path(args.save)
+    _, data, _ = load_valid(path, today)
+    page = render_report(data, today, args.template)
     out = Path(args.out) if args.out else path.with_name("phd-compass-report.html")
     write_text(out, page)
     targets = data.get("targets", [])
@@ -650,11 +848,19 @@ def main():
     p.add_argument("--today", help="YYYY-MM-DD; default: the system date")
     sub = p.add_subparsers(dest="cmd", required=True)
     for name, fn in (("init", cmd_init), ("validate", cmd_validate), ("sync", cmd_sync),
-                     ("report", cmd_report), ("agenda", cmd_agenda), ("next-id", cmd_next_id)):
+                     ("report", cmd_report), ("agenda", cmd_agenda), ("next-id", cmd_next_id), ("log", cmd_log)):
         sp = sub.add_parser(name)
         sp.add_argument("save", help="path to the save file (phd-compass.md)")
         sp.add_argument("--today", dest="today_sub", help="YYYY-MM-DD; default: the system date")
         sp.set_defaults(fn=fn)
+        if name == "log":
+            sp.add_argument("target", help="tracker ID (T004) or target key")
+            sp.add_argument("type", choices=list(ENTRY_TYPES))
+            sp.add_argument("--date", help="YYYY-MM-DD; default: today")
+            sp.add_argument("--note")
+            sp.add_argument("--follow-up", help="YYYY-MM-DD: follow up or check back by")
+            sp.add_argument("--link", help="path or URL, e.g. the email draft")
+            sp.add_argument("--by", choices=sorted(LOG_BY), default="claude")
         if name == "report":
             sp.add_argument("--out", help="output HTML path; default: phd-compass-report.html beside the save file")
             sp.add_argument("--template", help="report template; default: ../assets/report-template.html")
