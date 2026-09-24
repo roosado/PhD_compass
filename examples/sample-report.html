@@ -46,9 +46,21 @@ a{color:var(--accent);text-underline-offset:2px}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .mono{font-family:var(--font-mono);font-variant-numeric:tabular-nums}
-.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:32px 64px;display:grid;gap:44px}
-.wrap > *{min-width:0}
-@media (max-width:480px){.wrap{padding-inline:16px;gap:36px}}
+.wrap{max-width:1180px;margin:0 auto;padding-inline:20px;padding-block:24px 64px;display:grid;gap:28px}
+.wrap > *,.view > *{min-width:0}
+.view{display:grid;gap:44px}
+@media (max-width:480px){.wrap{padding-inline:16px;gap:24px}.view{gap:36px}}
+
+/* view tabs */
+.topbar{display:flex;align-items:center;gap:8px 16px;flex-wrap:wrap}
+.views{display:inline-flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;background:var(--surface)}
+.views a{padding:7px 14px;font-size:14px;font-weight:600;color:var(--ink-2);text-decoration:none;display:inline-flex;gap:7px;align-items:center}
+.views a+a{border-left:1px solid var(--border)}
+.views a:hover{color:var(--ink)}
+.views a[aria-current="page"]{background:var(--accent-wash);color:var(--accent)}
+.tab-n{font-family:var(--font-mono);font-weight:500;font-size:12px}
+.save-status{font-size:12.5px;color:var(--ink-2)}
+.save-status.err{color:var(--warn-text);font-weight:600}
 
 /* header */
 .eyebrow{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);margin:0 0 8px}
@@ -116,8 +128,20 @@ table.matrix{border-collapse:collapse;width:100%}
 .matrix tbody th{font-size:14px;font-weight:600;white-space:nowrap;width:150px}
 .matrix tbody th .cc{margin-left:6px}
 .cell{display:flex;flex-wrap:wrap;gap:6px}
-.chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--border);background:var(--surface);border-radius:999px;padding:3px 9px 3px 7px;cursor:pointer;font-size:13px;line-height:1.3;text-align:left}
+.chip{display:inline-flex;align-items:stretch;border:1px solid var(--border);background:var(--surface);border-radius:999px;font-size:13px;line-height:1.3}
 .chip:hover{background:var(--surface-2)}
+.chip.starred{border-color:var(--accent);box-shadow:inset 0 0 0 1px var(--accent)}
+.chip-main{display:inline-flex;align-items:center;gap:6px;border:0;background:none;border-radius:999px;padding:3px 9px 3px 7px;cursor:pointer;font-size:13px;line-height:1.3;text-align:left}
+.chip .star + .chip-main{padding-left:4px}
+.star{border:0;background:none;padding:0 0 0 7px;color:var(--muted);opacity:.45;display:inline-grid;place-items:center;flex:none;border-radius:999px}
+.star svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linejoin:round}
+button.star{cursor:pointer}
+button.star:hover,button.star:focus-visible{opacity:1;color:var(--accent)}
+.star.on{opacity:1;color:var(--accent)}
+.star.on svg{fill:currentColor}
+@media (hover:none){button.star{opacity:.75}}
+.c-pri-in .star,.card-head .star{padding:0;width:24px;height:24px}
+.c-pri-in .star svg,.card-head .star svg{width:16px;height:16px}
 .chip.pri-C .nm{color:var(--ink-2)}
 .chip .pm-t{font-size:11px;color:var(--ink-2)}
 .matrix-legend{margin-top:14px;display:flex;flex-wrap:wrap;gap:8px 22px;font-size:12.5px;color:var(--ink-2)}
@@ -214,6 +238,47 @@ tr.flash td{animation:flash 1.6s ease-out}
   tr.det dd{margin-bottom:8px}
 }
 
+/* pipeline */
+.seg button{border:0;background:none;padding:0 11px;cursor:pointer;font-size:13px;font-weight:500;color:var(--ink);display:inline-flex;align-items:center;gap:6px}
+.seg button+button{border-left:1px solid var(--border)}
+.seg button[aria-pressed="true"]{background:var(--accent-wash);color:var(--accent)}
+.seg button .n{font-family:var(--font-mono);font-size:12px;color:var(--muted)}
+@media (max-width:760px){.seg.wide{height:auto;flex-wrap:wrap}.seg.wide button{height:34px}}
+.cards{display:grid;gap:14px}
+.card{display:grid;gap:14px}
+.card-head{display:flex;align-items:flex-start;gap:10px;flex-wrap:wrap}
+.card-head .badge{margin-top:3px}
+.card-title{flex:1 1 260px;min-width:0}
+.card-title .pi{font-weight:600;font-size:15.5px}
+.card-title .sub{font-size:13px;color:var(--ink-2)}
+.stage{font-size:12px;font-weight:600;padding:3px 9px;border-radius:999px;background:var(--surface-2);color:var(--ink-2);white-space:nowrap}
+.stage.g-talking,.stage.g-applying{background:var(--accent-wash);color:var(--accent)}
+.card-next{border-left:3px solid var(--axis);padding:2px 0 2px 12px;display:grid;gap:3px}
+.card-next.soon{border-left-color:var(--warn)}
+.card-next .step{font-weight:600}
+.card-next .due{font-size:12.5px;color:var(--ink-2)}
+.card-next.soon .due{color:var(--warn-text);font-weight:600}
+.card-next .extra{font-size:13px;color:var(--ink-2)}
+.ask{font-size:12.5px;font-weight:400;color:var(--ink-2)}
+.facts{display:grid;grid-template-columns:150px 1fr;gap:4px 14px;margin:0;font-size:13px}
+.facts dt{font-size:11.5px;font-weight:600;color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em;padding-top:1px}
+.facts dd{margin:0;min-width:0;overflow-wrap:anywhere}
+.log{list-style:none;margin:0;padding:0;border-top:1px solid var(--hair)}
+.log li{display:grid;grid-template-columns:92px minmax(0,1fr) auto;gap:4px 12px;padding:9px 0;border-bottom:1px solid var(--hair);font-size:13.5px}
+.log .date{font-family:var(--font-mono);font-size:12.5px;padding-top:1px}
+.log .etype{font-weight:600}
+.log .lnote{white-space:pre-line;overflow-wrap:anywhere}
+.log .sub{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
+.log .empty-log{grid-template-columns:1fr;color:var(--ink-2)}
+.plain-list{margin:10px 0 0;padding-left:18px;font-size:13.5px;display:grid;gap:6px}
+.pipe-note p{margin:0 0 6px;max-width:80ch;font-size:14px}
+.pipe-note p:last-child{margin:0}
+.pipe-note code{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
+@media (max-width:480px){
+  .facts{grid-template-columns:1fr;gap:0}.facts dd{margin-bottom:6px}
+  .log li{grid-template-columns:minmax(0,1fr) auto}.log .date{grid-column:1/-1}
+}
+
 /* tooltip */
 #tip{position:fixed;z-index:50;max-width:320px;background:var(--ink);color:var(--surface);padding:8px 10px;border-radius:6px;font-size:12.5px;line-height:1.45;pointer-events:none;box-shadow:0 6px 22px rgba(0,0,0,.2)}
 #tip b{display:block;font-weight:600;margin-bottom:2px}
@@ -227,6 +292,15 @@ footer ul{margin:0;padding-left:18px}
 </head>
 <body>
 <div class="wrap" id="app">
+  <div class="topbar">
+    <nav class="views" aria-label="Views">
+      <a href="#map" id="tab-map">Target map</a>
+      <a href="#pipeline" id="tab-pipeline">Pipeline <span class="tab-n" id="tab-n"></span></a>
+    </nav>
+    <span class="save-status" id="save-status" aria-live="polite"></span>
+  </div>
+
+  <div class="view" id="view-map">
   <header>
     <p class="eyebrow" id="eyebrow"></p>
     <h1 id="title"></h1>
@@ -292,6 +366,7 @@ footer ul{margin:0;padding-left:18px}
         </div>
         <label class="chk" id="f-work-wrap" hidden><input type="checkbox" id="f-work"> <span id="f-work-label"></span></label>
         <label class="chk" id="f-new-wrap" hidden><input type="checkbox" id="f-new"> <span id="f-new-label">New since last scan</span></label>
+        <label class="chk" id="f-star-wrap" hidden><input type="checkbox" id="f-star"> Starred only</label>
         <button type="button" class="btn" data-act="reset">Reset</button>
         <span class="count" id="count" aria-live="polite"></span>
       </div>
@@ -335,6 +410,31 @@ footer ul{margin:0;padding-left:18px}
       <ul id="reminders"></ul>
     </div>
   </footer>
+  </div>
+
+  <div class="view" id="view-pipeline" hidden>
+    <header>
+      <p class="eyebrow">Your pipeline</p>
+      <h1>Pipeline</h1>
+      <p class="lede">The targets you've starred: what you've done, when you did it, and what comes next.</p>
+    </header>
+
+    <div class="panel pipe-note" id="pipe-note"></div>
+
+    <section aria-labelledby="h-due">
+      <h2 id="h-due">Due next</h2>
+      <p class="sub-h">The next step for each active target, soonest first. Steps come from your log, ad deadlines and research dates.</p>
+      <ol class="next" id="pipe-due"></ol>
+    </section>
+
+    <section aria-labelledby="h-starred">
+      <h2 id="h-starred">Starred targets</h2>
+      <p class="sub-h">One card per target, with its log newest first.</p>
+      <div class="filters"><div class="seg wide" role="group" aria-label="Filter by stage" id="pipe-filter"></div></div>
+      <div class="cards" id="pipe-cards"></div>
+      <div id="pipe-extra"></div>
+    </section>
+  </div>
 </div>
 <div id="tip" role="tooltip" hidden></div>
 
@@ -420,6 +520,37 @@ const signalled = RECORDS.filter(r => r.kind === "group" || r.kind === "programm
 // "New" means first seen after the previous scan; with a single scan nothing is flagged.
 const isNew = x => Boolean(META.previousScan && x.added && x.added > META.previousScan);
 const newTag = x => isNew(x) ? ` <span class="new-tag">new</span>` : "";
+
+// ---------- Pipeline: starred targets, their log, and next steps (computed by compass.py from the log) ----------
+let LOG = OK && Array.isArray(DATA.log) ? DATA.log : [];
+let PIPE = OK && DATA.pipeline ? DATA.pipeline : {};
+const ENTRY_LABELS = {drafted:"Email drafted", emailed:"Emailed the PI", followup:"Sent a follow-up", "reply-yes":"Reply: interested",
+  "reply-other":"Reply: redirected or other", "reply-no":"Reply: no place", meeting:"Call or meeting", preparing:"Started the application",
+  applied:"Applied", interview:"Interview", offer:"Offer", accepted:"Accepted", rejected:"Rejected", withdrawn:"Withdrew",
+  closed:"Closed (no reply or dropped)", note:"Note"};
+const STAGES = {
+  starred:{label:"To contact", group:"contact"}, drafted:{label:"Email drafted", group:"contact"},
+  waiting:{label:"Waiting for reply", group:"waiting"},
+  talking:{label:"In conversation", group:"talking"}, declined:{label:"Declined", group:"talking"},
+  preparing:{label:"Preparing application", group:"applying"}, applied:{label:"Applied", group:"applying"},
+  interview:{label:"Interview", group:"applying"}, offer:{label:"Offer", group:"applying"},
+  accepted:{label:"Accepted", group:"closed"}, closed:{label:"Closed", group:"closed"}
+};
+const STAGE_GROUPS = [["contact","To contact"],["waiting","Waiting for reply"],["talking","In conversation"],["applying","Applying"]];
+const pipeUI = {edit:false, group:"", form:null, confirm:null};
+const WARN = `<svg class="ico-warn" viewBox="0 0 12 12" aria-hidden="true"><path d="M6 1 11.2 10.5H.8Z" fill="var(--warn)"/><path d="M6 4.6v2.6M6 8.6v.1" stroke="#1a1300" stroke-width="1.3" stroke-linecap="round"/></svg>`;
+const STAR_SVG = `<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.7l1.95 3.95 4.35.63-3.15 3.07.74 4.33L8 11.63l-3.89 2.05.74-4.33L1.7 6.28l4.35-.63z"/></svg>`;
+const recordByKey = key => RECORDS.find(r => r.key === key);
+const isStarred = key => Boolean(recordByKey(key)?.starred);
+const entriesOf = key => LOG.filter(e => e.key === key).sort((a, b) => a.date.localeCompare(b.date) || a.id.localeCompare(b.id));
+const dueRel = s => { const n = daysUntil(s); return n < 0 ? `${-n} ${n === -1 ? "day" : "days"} overdue` : rel(s); };
+const stepHtml = m => `${esc(m.text)}${m.ask ? ` <span class="ask">(ask Claude: "${esc(m.ask)}")</span>` : ""}`;
+// Editable when served by `compass.py serve` (a button); otherwise a static mark on starred targets only.
+const starBtn = r => {
+  const on = Boolean(r.starred);
+  if (pipeUI.edit) return `<button type="button" class="star${on ? " on" : ""}" data-star="${esc(r.key)}" aria-pressed="${on}" aria-label="${on ? "Unstar" : "Star"} ${esc(r.short)}" title="${on ? "Remove from the pipeline (the log is kept)" : "Add to the pipeline"}">${STAR_SVG}</button>`;
+  return on ? `<span class="star on" title="Starred: in your pipeline" role="img" aria-label="Starred">${STAR_SVG}</span>` : "";
+};
 
 function renderHeader(){
   $("title").textContent = META.title;
@@ -519,7 +650,7 @@ function chip(r){
   const marks = {open:"open", upcoming:"upcoming", standing:"call", poorfit:"open, poor fit"};
   const mark = marks[r.pos] ? `<span class="pm ${p.mark}"></span><span class="pm-t">${marks[r.pos]}</span>` : "";
   const t = tip(`${r.pi}`, `${r.inst}`, r.topic, `Signal: ${SIGNALS[r.signal].label}`, `Position: ${p.label}`);
-  return `<button type="button" class="chip pri-${esc(r.pri)}" data-focus="${esc(r.key)}" data-tip="${t}" aria-label="${esc(r.pi)}, priority ${esc(r.pri)}, ${esc(SIGNALS[r.signal].label)}. Show in lookup table">${swatch(r.signal)}<span class="badge b-${esc(r.pri)}">${esc(r.pri)}</span><span class="nm">${esc(r.short)}</span>${mark}${newTag(r)}</button>`;
+  return `<span class="chip pri-${esc(r.pri)}${r.starred ? " starred" : ""}">${starBtn(r)}<button type="button" class="chip-main" data-focus="${esc(r.key)}" data-tip="${t}" aria-label="${esc(r.pi)}, priority ${esc(r.pri)}, ${esc(SIGNALS[r.signal].label)}. Show in lookup table">${swatch(r.signal)}<span class="badge b-${esc(r.pri)}">${esc(r.pri)}</span><span class="nm">${esc(r.short)}</span>${mark}${newTag(r)}</button></span>`;
 }
 
 function renderMatrix(){
@@ -672,7 +803,7 @@ function renderTimeline(){
 }
 
 const STORE = "phd-compass:filters:" + norm(META.title).replace(/[^a-z0-9]+/g, "-");
-const defaults = () => ({q:"", kind:"", country:"", area:"", signal:"", pos:"", pri:{A:true, B:true, C:true}, work:false, newOnly:false, sort:{key:"pri", dir:1}});
+const defaults = () => ({q:"", kind:"", country:"", area:"", signal:"", pos:"", pri:{A:true, B:true, C:true}, work:false, newOnly:false, starred:false, sort:{key:"pri", dir:1}});
 let state = defaults();
 const openRows = new Set();
 try { const saved = JSON.parse(localStorage.getItem(STORE) || "null"); if (saved) state = Object.assign(defaults(), saved, {pri:Object.assign({A:true,B:true,C:true}, saved.pri)}); } catch (e) {}
@@ -688,6 +819,7 @@ function matches(r){
   if (!state.pri[r.pri]) return false;
   if (state.work && META.workPreference && r.work !== "yes") return false;
   if (state.newOnly && !isNew(r)) return false;
+  if (state.starred && !r.starred) return false;
   if (state.q) {
     const hay = norm([r.id, r.short, r.pi, r.group, r.inst, r.topic, countryName(r.cc)].join(" "));
     if (!hay.includes(norm(state.q.trim()))) return false;
@@ -721,7 +853,7 @@ function buildControls(){
 
 function syncControls(){
   $("f-q").value = state.q; $("f-kind").value = state.kind; $("f-country").value = state.country; $("f-area").value = state.area;
-  $("f-signal").value = state.signal; $("f-pos").value = state.pos; $("f-work").checked = state.work; $("f-new").checked = state.newOnly;
+  $("f-signal").value = state.signal; $("f-pos").value = state.pos; $("f-work").checked = state.work; $("f-new").checked = state.newOnly; $("f-star").checked = state.starred;
   ["A","B","C"].forEach(p => $("f-pri-" + p).checked = state.pri[p]);
 }
 
@@ -754,6 +886,7 @@ function detailRow(r){
     ${dd("Also tagged", r.tags.map(areaLabel).map(esc).join(", "))}
     ${dd("Notes", r.notes.map(esc).join("<br>"))}
     ${dd("Tracker", r.kind === "watch" ? "Not tracked (watch list)" : `${esc(r.id)} · ${esc(r.type || KINDS[r.kind] || r.kind)} · status ${esc(r.status)}`)}
+    ${dd("Pipeline", pipelineLine(r))}
     ${dd("Report", r.report ? `<a href="${esc(safeHref(r.report))}" target="_blank" rel="noopener">${esc(r.report)}</a>` : "")}
     ${dd("Sources", r.links.map(l => `<a href="${esc(safeHref(l.href))}" target="_blank" rel="noopener">${esc(l.label)} ↗</a>${l.accessed ? ` <span class="mono">(${esc(l.accessed)})</span>` : ""}`).join(" · "))}
   </dl></td></tr>`;
@@ -770,7 +903,7 @@ function renderTable(){
   $("lookup-body").innerHTML = rows.length ? rows.map(r => {
     const open = openRows.has(r.key);
     return `<tr class="row${open ? " is-open" : ""}" id="row-${esc(r.key)}">
-      <td class="c-pri" data-label="Priority"><div class="c-pri-in"><button type="button" class="exp" data-toggle="${esc(r.key)}" aria-expanded="${open}" aria-controls="det-${esc(r.key)}" aria-label="Details for ${esc(r.pi)}">${chev}</button><span class="badge b-${esc(r.pri)}" title="Priority ${esc(r.pri)}">${esc(r.pri)}</span><span class="cc">${esc(r.id || "—")}</span></div></td>
+      <td class="c-pri" data-label="Priority"><div class="c-pri-in">${starBtn(r)}<button type="button" class="exp" data-toggle="${esc(r.key)}" aria-expanded="${open}" aria-controls="det-${esc(r.key)}" aria-label="Details for ${esc(r.pi)}">${chev}</button><span class="badge b-${esc(r.pri)}" title="Priority ${esc(r.pri)}">${esc(r.pri)}</span><span class="cc">${esc(r.id || "—")}</span></div></td>
       <td class="c-pi" data-label="PI, group or programme"><div class="pi">${esc(r.pi)}${newTag(r)}</div><div class="sub">${esc(r.group)}</div></td>
       <td data-label="Institution">${esc(r.inst)}</td>
       <td data-label="Country">${esc(countryName(r.cc))} <span class="cc">${esc(r.cc)}</span></td>
@@ -806,6 +939,113 @@ function renderScholarships(){
     }).join("") + `</tbody>`;
 }
 
+// ---------- Pipeline view ----------
+function pipelineLine(r){
+  const s = PIPE[r.key];
+  if (!s) return "";
+  const last = entriesOf(r.key).at(-1);
+  return `${r.starred ? "" : "Unstarred · "}${esc(STAGES[s.stage]?.label || s.stage)}${last ? ` · last: ${esc((ENTRY_LABELS[last.type] || last.type).toLowerCase())} <span class="mono">${esc(last.date)}</span>` : ""} · <button type="button" class="btn" style="height:26px;padding:0 8px;font-size:12.5px" data-pact="open" data-key="${esc(r.key)}">Open in pipeline</button>`;
+}
+
+function renderTabs(){
+  const starred = RECORDS.filter(r => r.starred && PIPE[r.key]);
+  const due = starred.filter(r => PIPE[r.key].main?.due && daysUntil(PIPE[r.key].main.due) <= 0).length;
+  $("tab-n").textContent = starred.length ? `${starred.length}${due ? ` · ${due} due` : ""}` : "";
+  $("f-star-wrap").hidden = !pipeUI.edit && !RECORDS.some(r => r.starred);
+}
+
+function pipeNote(){
+  if (pipeUI.edit) return `<p>Star targets in the target map, and log what you do with <strong>Log an action</strong>. Every change saves to your save file straight away, and Claude reads it from there.</p>`;
+  return `<p><strong>This report is a snapshot of your save file.</strong> To log what you did, tell Claude in your conversation, for example "I emailed ${esc(RECORDS.find(r => r.starred)?.short || "the PI")} today" or "star T004". Claude records it and rebuilds the report.</p>
+    <p>In Claude Code you can edit here directly: ask Claude to open your report, or run <code>open-report.cmd</code> (Windows) or <code>./open-report.sh</code> in your search folder.</p>`;
+}
+
+function entryItem(key, e){
+  let acts = "";
+  if (pipeUI.edit) acts = pipeUI.confirm === e.id
+    ? `<span class="sub">Delete this entry?</span><button type="button" class="btn btn-s" data-pact="del-yes" data-key="${esc(key)}" data-id="${esc(e.id)}">Delete</button><button type="button" class="btn btn-s" data-pact="del-no">Keep</button>`
+    : `<button type="button" class="btn btn-s" data-pact="edit" data-key="${esc(key)}" data-id="${esc(e.id)}">Edit</button><button type="button" class="btn btn-s" data-pact="del" data-key="${esc(key)}" data-id="${esc(e.id)}" aria-label="Delete entry">Delete</button>`;
+  return `<li><span class="date">${esc(e.date)}</span><div>
+      <div class="etype">${esc(ENTRY_LABELS[e.type] || e.type)}${e.by === "claude" ? ` <span class="new-tag">claude</span>` : ""}</div>
+      ${e.note ? `<div class="lnote">${esc(e.note)}</div>` : ""}
+      ${e.followUp ? `<div class="sub">Follow up or check back by <span class="mono">${esc(e.followUp)}</span></div>` : ""}
+      ${e.link ? `<div class="sub mono">${esc(e.link)}</div>` : ""}
+    </div><div class="eacts">${acts}</div></li>`;
+}
+
+function card(r){
+  const s = PIPE[r.key], m = s.main, entries = entriesOf(r.key);
+  const soon = m?.due && daysUntil(m.due) <= 7;
+  const form = pipeUI.edit && pipeUI.form?.key === r.key;
+  const facts = [
+    ["Research", r.researched ? `Updated <span class="mono">${esc(r.researched)}</span> (${rel(r.researched)})${r.report ? ` · <span class="mono">${esc(r.report)}</span>` : ""}` : "Not researched in depth yet"],
+    ["Open position", r.pos === "open" && r.deadline ? `Closes <span class="mono">${esc(r.deadline)}</span> (${rel(r.deadline)})` : esc(POSITIONS[r.pos].label)],
+    ["Tracker", r.kind === "watch" ? "Watch list" : `${esc(r.id)} · status ${esc(r.status)}`]
+  ];
+  return `<article class="panel card" id="card-${esc(r.key)}">
+    <div class="card-head">${starBtn(r)}<span class="badge b-${esc(r.pri)}" title="Priority ${esc(r.pri)}">${esc(r.pri)}</span>
+      <div class="card-title"><div class="pi">${esc(r.pi)}</div><div class="sub">${[r.group, r.inst, countryName(r.cc)].filter(Boolean).map(esc).join(" · ")} <span class="cc">${esc(r.cc)}</span></div></div>
+      <span class="stage g-${STAGES[s.stage]?.group || "contact"}">${esc(STAGES[s.stage]?.label || s.stage)}</span></div>
+    ${m ? `<div class="card-next${soon ? " soon" : ""}"><div class="step">Next: ${stepHtml(m)}</div>${m.due ? `<div class="due">${soon ? WARN + " " : ""}Due <span class="mono">${esc(m.due)}</span> · ${dueRel(m.due)}</div>` : ""}${(s.extras || []).map(x => `<div class="extra">Also: ${stepHtml(x)}</div>`).join("")}</div>` : ""}
+    <dl class="facts">${facts.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join("")}</dl>
+    <ol class="log" aria-label="Log for ${esc(r.short)}, newest first">${entries.length ? [...entries].reverse().map(e => entryItem(r.key, e)).join("") : `<li class="empty-log">Nothing logged yet.</li>`}</ol>
+    ${form ? entryForm(r.key, pipeUI.form.id ? entries.find(e => e.id === pipeUI.form.id) : null, s.stage)
+      : `<div class="card-acts">${pipeUI.edit ? `<button type="button" class="btn btn-primary" data-pact="log" data-key="${esc(r.key)}">Log an action</button>` : ""}<button type="button" class="btn" data-pact="map" data-key="${esc(r.key)}">Show in map</button></div>`}
+  </article>`;
+}
+
+function renderPipeline(){
+  $("pipe-note").innerHTML = pipeNote();
+  const items = RECORDS.filter(r => r.starred && PIPE[r.key]);
+  const active = items.filter(r => STAGES[PIPE[r.key].stage]?.group !== "closed"), closed = items.filter(r => STAGES[PIPE[r.key].stage]?.group === "closed");
+  const dueOf = r => PIPE[r.key].main?.due || "9999";
+  const byDue = (a, b) => dueOf(a).localeCompare(dueOf(b)) || a.pri.localeCompare(b.pri) || String(a.short).localeCompare(String(b.short));
+
+  const due = active.filter(r => PIPE[r.key].main?.due).sort(byDue);
+  $("pipe-due").innerHTML = due.length ? due.map(r => {
+    const m = PIPE[r.key].main, d = daysUntil(m.due);
+    return `<li class="${d <= 7 ? "soon" : ""}"><span class="when">${esc(m.due)}</span><span class="rel">${d <= 7 ? WARN : ""}<span>${dueRel(m.due)}</span></span><span class="what"><b>${esc(r.short)}</b>: ${stepHtml(m)}</span></li>`;
+  }).join("") : `<li class="empty" style="border:0">Nothing dated yet.</li>`;
+
+  const counts = Object.fromEntries(STAGE_GROUPS.map(([g]) => [g, active.filter(r => STAGES[PIPE[r.key].stage]?.group === g).length]));
+  if (pipeUI.group && !counts[pipeUI.group]) pipeUI.group = "";
+  $("pipe-filter").innerHTML = [["", "All", active.length], ...STAGE_GROUPS.map(([g, l]) => [g, l, counts[g]])]
+    .map(([g, l, n]) => `<button type="button" data-pact="group" data-v="${g}" aria-pressed="${pipeUI.group === g}">${esc(l)}<span class="n">${n}</span></button>`).join("");
+
+  const shown = active.filter(r => !pipeUI.group || STAGES[PIPE[r.key].stage]?.group === pipeUI.group).sort(byDue);
+  $("pipe-cards").innerHTML = shown.length ? shown.map(card).join("")
+    : `<div class="panel empty">${items.length ? "No starred target at this stage." : "No starred targets yet. Star the groups and positions you're pursuing" + (pipeUI.edit ? " in the target map." : ": tell Claude which ones.")}</div>`;
+
+  const unstarred = RECORDS.filter(r => !r.starred && entriesOf(r.key).length);
+  const gone = [...new Set(LOG.map(e => e.key))].filter(k => !recordByKey(k));
+  let extra = "";
+  if (closed.length) extra += `<details class="more"><summary>Closed (${closed.length})</summary><div class="cards" style="margin-top:12px">${closed.sort(byDue).map(card).join("")}</div></details>`;
+  if (unstarred.length) extra += `<details class="more"><summary>Unstarred, with history (${unstarred.length})</summary><ul class="plain-list">${unstarred.map(r => { const es = entriesOf(r.key), l = es.at(-1); return `<li>${esc(r.pi)}, ${esc(r.inst)}: ${plural(es.length, "entry", "entries")}, last ${esc((ENTRY_LABELS[l.type] || l.type).toLowerCase())} <span class="mono">${esc(l.date)}</span> ${starBtn(r)}</li>`; }).join("")}</ul></details>`;
+  if (gone.length) extra += `<details class="more"><summary>No longer in the search (${gone.length})</summary><ul class="plain-list">${gone.map(k => `<li><span class="mono">${esc(k)}</span>: ${entriesOf(k).map(e => `${esc(e.date)} ${esc(ENTRY_LABELS[e.type] || e.type)}${e.note ? ` (${esc(e.note)})` : ""}`).join("; ")}</li>`).join("")}</ul></details>`;
+  $("pipe-extra").innerHTML = extra;
+}
+
+function showView(){
+  const v = location.hash === "#pipeline" ? "pipeline" : "map";
+  $("view-map").hidden = v !== "map"; $("view-pipeline").hidden = v !== "pipeline";
+  $("tab-map").setAttribute("aria-current", v === "map" ? "page" : "false");
+  $("tab-pipeline").setAttribute("aria-current", v === "pipeline" ? "page" : "false");
+}
+function goView(v){ history.replaceState(null, "", "#" + v); showView(); }
+
+function pipelineClick(t){
+  const {pact, key} = t.dataset;
+  if (t.dataset.star) { if (pipeUI.edit) toggleStar(t); }
+  else if (pact === "group") { pipeUI.group = t.dataset.v; renderPipeline(); document.querySelector(`[data-pact="group"][data-v="${pipeUI.group}"]`)?.focus(); }
+  else if (pact === "map") { goView("map"); focusRecord(key); }
+  else if (pact === "open") {
+    goView("pipeline");
+    const c = $("card-" + key);
+    if (c) c.scrollIntoView({behavior:reduceMotion ? "auto" : "smooth", block:"start"}); else window.scrollTo(0, 0);
+  }
+  else if (pipeUI.edit) editClick(t);
+}
+
 function update(){ save(); renderSignalBar(); renderTable(); }
 
 function scrollToTable(el){
@@ -824,6 +1064,8 @@ function focusRecord(key){
 
 function wire(){
   document.addEventListener("click", e => {
+    const p = e.target.closest("[data-star],[data-pact]");
+    if (p) { pipelineClick(p); return; }
     const t = e.target.closest("[data-focus],[data-toggle],[data-sort],[data-signal],[data-act]");
     if (!t) return;
     if (t.dataset.focus) focusRecord(t.dataset.focus);
@@ -837,6 +1079,8 @@ function wire(){
   ["A","B","C"].forEach(p => $("f-pri-" + p).addEventListener("change", e => { state.pri[p] = e.target.checked; update(); }));
   $("f-work").addEventListener("change", e => { state.work = e.target.checked; update(); });
   $("f-new").addEventListener("change", e => { state.newOnly = e.target.checked; update(); });
+  $("f-star").addEventListener("change", e => { state.starred = e.target.checked; update(); });
+  window.addEventListener("hashchange", () => { showView(); window.scrollTo(0, 0); });
 
   // Tooltip: one element, content from data-tip ("Title|line|line").
   const tipEl = $("tip");
@@ -864,6 +1108,7 @@ function wire(){
 if (OK) {
   renderHeader(); buildControls(); syncControls(); wire();
   renderNext(); renderStats(); renderSignalBar(); renderMatrix(); renderTimeline(); renderTable(); renderAds(); renderScholarships();
+  renderTabs(); renderPipeline(); showView();
 } else {
   document.title = "phd-compass report template";
   $("app").innerHTML = `<p class="empty">This is the phd-compass report template. Build a report from a save file with <code>compass.py report phd-compass.md</code>.</p>`;
