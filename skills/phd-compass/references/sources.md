@@ -74,6 +74,10 @@ Speaker and author lists of the field's main conferences, summer schools and wor
 
 ## Fetch notes
 - Some boards block direct fetching (HTTP 403): search them with a site-restricted web search (`site:academicpositions.com <keywords>`) and open individual ads.
+- EURAXESS keyword search (checked 2026-09-21): use `https://euraxess.ec.europa.eu/jobs/search?f%5B0%5D=keywords%3A<term>`; a plain `?keywords=` parameter is ignored and returns the newest jobs. Matching is loose full-text, newest first, so read the first page or two.
+- AcademicTransfer search (checked 2026-09-21): `https://www.academictransfer.com/en/jobs/?q=<term>` fetches directly.
+- CORDIS bulk data (checked 2026-09-21): [the Horizon Europe projects CSV](https://cordis.europa.eu/data/cordis-HORIZONprojects-csv.zip) lists every project and participant; filtering it locally by keyword is much faster than searching project by project.
+- Parallel search agents share one web-search budget for the session: brief each to prefer fetching known pages over new searches, and split a scan across three or four agents at most.
 - Vacancy PDFs: fetch and read the file.
 - Very long PDFs may exceed fetch limits: use the abstract page or an HTML version.
 - Community sites (forums, admissions-results boards) can hint at timelines, but never count as a source for a fact in the save file.
