@@ -271,6 +271,17 @@ tr.flash td{animation:flash 1.6s ease-out}
 .log .sub{font-size:12.5px;color:var(--muted);overflow-wrap:anywhere}
 .log .empty-log{grid-template-columns:1fr;color:var(--ink-2)}
 .plain-list{margin:10px 0 0;padding-left:18px;font-size:13.5px;display:grid;gap:6px}
+.plain-list li .star{vertical-align:-3px}
+.eacts{display:flex;gap:6px;align-items:flex-start;flex-wrap:wrap}
+.btn-s{height:28px;padding:0 9px;font-size:12.5px}
+.btn-primary{background:var(--accent);color:var(--surface);border-color:var(--accent)}
+.btn-primary:hover{background:var(--accent);opacity:.9}
+.card-acts{display:flex;gap:8px;flex-wrap:wrap}
+.entry-form{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px 14px;padding:14px;background:var(--surface-2);border-radius:8px}
+.entry-form .f-wide,.entry-form .form-acts{grid-column:1/-1}
+.entry-form .form-acts{display:flex;gap:8px;flex-wrap:wrap}
+.entry-form input,.entry-form select,.entry-form textarea{width:100%;max-width:none;height:34px;border:1px solid var(--border);border-radius:6px;background:var(--surface);color:var(--ink);font:inherit;font-size:13.5px;padding:0 10px}
+.entry-form textarea{height:auto;padding:7px 10px;resize:vertical;line-height:1.45}
 .pipe-note p{margin:0 0 6px;max-width:80ch;font-size:14px}
 .pipe-note p:last-child{margin:0}
 .pipe-note code{font-family:var(--font-mono);font-size:12.5px;background:var(--surface-2);padding:1px 5px;border-radius:4px}
@@ -508,12 +519,13 @@ const tip = (title, ...lines) => esc([title, ...lines.filter(Boolean)].join("|")
 const safeHref = h => /^(https?:|mailto:|\.{0,2}\/|[\w-]+\/|[\w.-]+\.(md|html|pdf|docx|tex)$)/i.test(String(h || "")) ? h : "#";
 
 // Normalise optional fields so the renderers can trust them.
-RECORDS.forEach(r => {
+function normalise(r){
   r.tags = Array.isArray(r.tags) ? r.tags : []; r.links = Array.isArray(r.links) ? r.links : []; r.notes = Array.isArray(r.notes) ? r.notes : [];
   if (!SIGNALS[r.signal]) r.signal = "na";
   if (!POSITIONS[r.pos]) r.pos = "none";
   if (r.pos === "open" && r.deadline && daysUntil(r.deadline) < 0) { r.pos = "past"; r.posText = `Closed ${r.deadline}`; }
-});
+}
+RECORDS.forEach(normalise);
 ADS.forEach(a => { a.dates = Array.isArray(a.dates) ? a.dates.filter(d => ISO.test(d)) : []; if (!AD_STATUS[a.status]) a.status = "closed"; });
 const tracked = RECORDS.filter(r => r.kind !== "watch");
 const signalled = RECORDS.filter(r => r.kind === "group" || r.kind === "programme");
@@ -1046,6 +1058,124 @@ function pipelineClick(t){
   else if (pipeUI.edit) editClick(t);
 }
 
+// ---------- Editing, when served by `compass.py serve` ----------
+// Saves send {starred, log}; the server writes the save file, applies the follow-up rules and returns the new data.
+const SERVER = {etag:null, queue:Promise.resolve()};
+const isoOf = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`; // local date, not UTC
+const TODAY_ISO = isoOf(TODAY);
+const addDays = (s, n) => { const d = parseISO(s); d.setDate(d.getDate() + n); return isoOf(d); };
+const newId = () => (crypto.randomUUID ? crypto.randomUUID().replace(/-/g, "") : Math.random().toString(16).slice(2) + Date.now().toString(16)).slice(0, 8);
+let statusTimer;
+function setStatus(msg, err){
+  const el = $("save-status");
+  el.textContent = msg; el.classList.toggle("err", Boolean(err));
+  clearTimeout(statusTimer);
+  if (!err) statusTimer = setTimeout(() => { el.textContent = ""; }, 2500);
+}
+
+function applyPayload(p, tag){
+  SERVER.etag = tag;
+  (p.targets || []).forEach(t => { const r = recordByKey(t.key); if (r) { delete r.starred; Object.assign(r, t); normalise(r); } });
+  LOG = Array.isArray(p.log) ? p.log : [];
+  PIPE = p.pipeline || {};
+  renderNext(); renderStats(); renderMatrix(); renderTable(); renderTabs(); renderPipeline();
+}
+
+async function serverLoad(){
+  if (!/^https?:$/.test(location.protocol)) return;
+  try {
+    const res = await fetch("api/pipeline", {cache:"no-store"});
+    if (!res.ok || !(res.headers.get("Content-Type") || "").includes("json")) throw new Error(String(res.status));
+    const p = await res.json();
+    pipeUI.edit = true;
+    applyPayload(p, res.headers.get("ETag"));
+  } catch (e) {
+    if (pipeUI.edit) setStatus("Can't reach the report server: reopen the report", true);
+  }
+}
+
+function pipeChange(fn){
+  SERVER.queue = SERVER.queue.then(async () => {
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const next = {starred:RECORDS.filter(r => r.starred).map(r => r.key), log:structuredClone(LOG)};
+      fn(next);
+      let res;
+      try { res = await fetch("api/pipeline", {method:"PUT", headers:{"Content-Type":"application/json", "If-Match":SERVER.etag || ""}, body:JSON.stringify(next)}); }
+      catch (e) { setStatus("Not saved: the report server isn't running. Reopen the report.", true); return false; }
+      if (res.ok || res.status === 409) applyPayload(await res.json(), res.headers.get("ETag"));
+      if (res.ok) { setStatus("Saved"); return true; }
+      if (res.status === 409) continue; // the save file changed (Claude updated it): re-apply on the fresh copy
+      const msg = (await res.json().catch(() => ({}))).error || `error ${res.status}`;
+      setStatus(`Not saved: ${msg}`, true); return false;
+    }
+    setStatus("Not saved: the save file kept changing. Try again.", true); return false;
+  });
+  return SERVER.queue;
+}
+
+// Put focus back on the same control, inside the same region (the element with the nearest id), after a re-render.
+function refocus(from, sel){
+  const host = from.closest("[id]")?.id;
+  return () => { const el = (host && $(host)?.querySelector(sel)) || document.querySelector(sel); if (el) el.focus(); };
+}
+
+function toggleStar(t){
+  const k = t.dataset.star, back = refocus(t, `[data-star="${CSS.escape(k)}"]`);
+  pipeChange(d => { d.starred = d.starred.includes(k) ? d.starred.filter(x => x !== k) : [...d.starred, k]; }).then(back);
+}
+
+function entryForm(key, entry, stage){
+  const e = entry || {date:TODAY_ISO, type:{starred:"emailed", drafted:"emailed", waiting:"followup"}[stage] || "note", note:"", followUp:null};
+  const fu = entry ? (e.followUp || "") : (["emailed","followup"].includes(e.type) ? addDays(e.date, 14) : "");
+  return `<form class="entry-form" data-key="${esc(key)}" data-id="${entry ? esc(entry.id) : ""}">
+    <div class="f"><label for="ef-date">Date</label><input type="date" id="ef-date" name="date" value="${esc(e.date)}" required></div>
+    <div class="f"><label for="ef-type">What happened</label><select id="ef-type" name="type">${Object.entries(ENTRY_LABELS).map(([k, v]) => `<option value="${k}"${k === e.type ? " selected" : ""}>${esc(v)}</option>`).join("")}</select></div>
+    <div class="f"><label for="ef-fu">Follow up or check back by</label><input type="date" id="ef-fu" name="followUp" value="${esc(fu)}" data-auto="${entry ? 0 : 1}"></div>
+    <div class="f f-wide"><label for="ef-note">Note</label><textarea id="ef-note" name="note" rows="2" placeholder="Subject, what they said, who else to contact…">${esc(e.note)}</textarea></div>
+    <div class="form-acts"><button type="submit" class="btn btn-primary">${entry ? "Save changes" : "Save"}</button><button type="button" class="btn" data-pact="cancel">Cancel</button></div>
+  </form>`;
+}
+
+function editClick(t){
+  const {pact, key, id} = t.dataset;
+  const logBtn = k => document.querySelector(`#card-${CSS.escape(k)} [data-pact="log"]`);
+  if (pact === "log" || pact === "edit") { pipeUI.form = {key, id:pact === "edit" ? id : null}; pipeUI.confirm = null; renderPipeline(); $("ef-date")?.focus(); }
+  else if (pact === "cancel") { const k = pipeUI.form?.key; pipeUI.form = null; renderPipeline(); if (k) logBtn(k)?.focus(); }
+  else if (pact === "del") { pipeUI.confirm = id; renderPipeline(); document.querySelector(`[data-pact="del-no"]`)?.focus(); }
+  else if (pact === "del-no") { pipeUI.confirm = null; renderPipeline(); }
+  else if (pact === "del-yes") { pipeUI.confirm = null; pipeChange(d => { d.log = d.log.filter(e => e.id !== id); }).then(() => logBtn(key)?.focus()); }
+}
+
+function wireEditing(){
+  document.addEventListener("submit", e => {
+    const f = e.target.closest("form.entry-form");
+    if (!f) return;
+    e.preventDefault();
+    const key = f.dataset.key, id = f.dataset.id, v = Object.fromEntries(new FormData(f));
+    const body = {date:v.date, type:v.type, note:v.note.trim(), followUp:v.followUp || null};
+    pipeChange(d => {
+      if (!d.starred.includes(key)) d.starred.push(key);
+      const old = id && d.log.find(en => en.id === id);
+      if (old) Object.assign(old, body);
+      else d.log.push({id:newId(), key, ...body, by:"owner"});
+    }).then(ok => { if (ok) { pipeUI.form = null; renderPipeline(); document.querySelector(`#card-${CSS.escape(key)} [data-pact="log"]`)?.focus(); } });
+  });
+  // New entries: an email proposes a follow-up date 14 days on, until the owner edits that field.
+  document.addEventListener("input", e => {
+    const f = e.target.closest("form.entry-form");
+    if (!f) return;
+    const fu = f.elements.followUp;
+    if (e.target === fu) { fu.dataset.auto = "0"; return; }
+    if (fu.dataset.auto !== "1" || !["date","type"].includes(e.target.name)) return;
+    const date = f.elements.date.value;
+    fu.value = ["emailed","followup"].includes(f.elements.type.value) && date ? addDays(date, 14) : "";
+  });
+  // Pick up changes Claude made to the save file when the owner comes back to the tab, unless a form is open.
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && pipeUI.edit && !pipeUI.form) serverLoad();
+  });
+}
+
 function update(){ save(); renderSignalBar(); renderTable(); }
 
 function scrollToTable(el){
@@ -1108,7 +1238,8 @@ function wire(){
 if (OK) {
   renderHeader(); buildControls(); syncControls(); wire();
   renderNext(); renderStats(); renderSignalBar(); renderMatrix(); renderTimeline(); renderTable(); renderAds(); renderScholarships();
-  renderTabs(); renderPipeline(); showView();
+  renderTabs(); renderPipeline(); showView(); wireEditing();
+  serverLoad();
 } else {
   document.title = "phd-compass report template";
   $("app").innerHTML = `<p class="empty">This is the phd-compass report template. Build a report from a save file with <code>compass.py report phd-compass.md</code>.</p>`;

@@ -16,6 +16,10 @@ Commands (every command accepts --today YYYY-MM-DD; default: the system date):
   next-id <save.md>                       the next free tracker ID
   log <save.md> <ID|key> <type> [--date D] [--note T] [--follow-up D] [--link L] [--by owner|claude]
                                           star a target, add an entry to its pipeline log, then sync
+  serve <save.md> [--port 8765] [--no-browser]
+                                          open the report at http://localhost:8765 with an editable
+                                          Pipeline tab; saves go straight into the save file
+  launcher <save.md>                      write open-report.cmd / open-report.sh beside the save file
 """
 
 import argparse
@@ -794,6 +798,174 @@ def cmd_report(args, today):
           f"{len(data.get('grants', [])) + len(data.get('calls', []))} grants and calls.")
 
 
+# ---------------------------------------------------------------- serve, launcher
+
+MAX_BODY = 1_000_000
+
+
+def cmd_serve(args, today):
+    """Serve the report with an editable Pipeline tab; saves go straight into the save file."""
+    import hashlib
+    import http.server
+    import urllib.request
+    import webbrowser
+
+    path = Path(args.save).resolve()
+    load_valid(path, today)
+    port = args.port
+    hosts = {f"localhost:{port}", f"127.0.0.1:{port}"}
+    origins = {f"http://{h}" for h in hosts}
+    day = (lambda: today) if args.today_given else dt.date.today
+
+    def etag(raw):
+        return '"' + hashlib.sha256(raw).hexdigest()[:32] + '"'
+
+    class Handler(http.server.SimpleHTTPRequestHandler):
+        extensions_map = {**http.server.SimpleHTTPRequestHandler.extensions_map,
+                          ".html": "text/html; charset=utf-8", ".md": "text/plain; charset=utf-8",
+                          ".js": "text/javascript; charset=utf-8", ".json": "application/json; charset=utf-8"}
+
+        def __init__(self, *a, **kw):
+            super().__init__(*a, directory=str(path.parent), **kw)
+
+        def end_headers(self):
+            self.send_header("Cache-Control", "no-store")
+            super().end_headers()
+
+        def list_directory(self, p):
+            self.send_error(404)
+            return None
+
+        def log_message(self, fmt, *a):
+            pass
+
+        def guard(self):
+            if self.headers.get("Host") not in hosts:
+                self.send_error(403, "Unknown host")
+                return False
+            origin = self.headers.get("Origin")
+            if origin is not None and origin not in origins:
+                self.send_error(403, "Foreign origin")
+                return False
+            return True
+
+        def reply(self, code, body, ctype="application/json; charset=utf-8", tag=None):
+            raw = body.encode("utf-8") if isinstance(body, str) else body
+            self.send_response(code)
+            self.send_header("Content-Type", ctype)
+            self.send_header("Content-Length", str(len(raw)))
+            if tag:
+                self.send_header("ETag", tag)
+            self.end_headers()
+            self.wfile.write(raw)
+
+        def error_json(self, code, message):
+            self.reply(code, json.dumps({"error": message}))
+
+        def current(self):
+            raw = path.read_bytes()
+            text, data, m = load(path)
+            return raw, text, data, m
+
+        def payload(self, raw, data):
+            return self.reply(200, json.dumps(report_payload(data, day()), ensure_ascii=False), tag=etag(raw))
+
+        def do_GET(self):
+            if not self.guard():
+                return
+            route = self.path.split("?")[0]
+            if route in ("/", "/index.html"):
+                _, _, data, _ = self.current()
+                f = validate(data, day())
+                if f.errors:
+                    return self.reply(500, "The save file has errors; run compass.py validate:\n" + "\n".join(f.errors), "text/plain; charset=utf-8")
+                return self.reply(200, render_report(data, day(), args.template), "text/html; charset=utf-8")
+            if route == "/api/pipeline":
+                raw, _, data, _ = self.current()
+                return self.payload(raw, data)
+            super().do_GET()
+
+        def do_HEAD(self):
+            if self.guard():
+                super().do_HEAD()
+
+        def do_PUT(self):
+            if not self.guard():
+                return
+            if self.path.split("?")[0] != "/api/pipeline":
+                return self.error_json(404, "Only /api/pipeline accepts writes")
+            if not (self.headers.get("Content-Type") or "").startswith("application/json"):
+                return self.error_json(415, "Send JSON")
+            length = int(self.headers.get("Content-Length") or 0)
+            if length <= 0 or length > MAX_BODY:
+                return self.error_json(413, "Body missing or over 1 MB")
+            body = self.rfile.read(length)
+            raw, text, data, m = self.current()
+            if self.headers.get("If-Match") != etag(raw):
+                return self.reply(409, json.dumps(report_payload(data, day()), ensure_ascii=False), tag=etag(raw))
+            try:
+                change = json.loads(body.decode("utf-8"))
+                starred, log = set(change["starred"]), change["log"]
+                if not isinstance(log, list):
+                    raise ValueError("'log' must be a list")
+            except (ValueError, KeyError, TypeError) as e:
+                return self.error_json(400, f"Expected {{starred: [keys], log: [entries]}}: {e}")
+            for t in data.get("targets", []):
+                if t.get("key") in starred:
+                    t["starred"] = True
+                else:
+                    t.pop("starred", None)
+            data["log"] = sorted(log, key=lambda e: (str(e.get("date")), str(e.get("id"))) if isinstance(e, dict) else ("", ""))
+            f = validate(data, day())
+            if f.errors:
+                return self.error_json(400, "; ".join(f.errors[:3]))
+            text = synced_text(text, data, m, day(), quiet=True)
+            write_atomic(path, text)
+            return self.payload(text.encode("utf-8"), data)
+
+    url = f"http://localhost:{port}/"
+    try:
+        server = http.server.ThreadingHTTPServer(("127.0.0.1", port), Handler)
+    except OSError:
+        try:
+            with urllib.request.urlopen(url + "api/pipeline", timeout=2) as r:
+                running = r.status == 200
+        except OSError:
+            running = False
+        if running:
+            print(f"Your report is already open at {url}")
+            if not args.no_browser:
+                webbrowser.open(url)
+            return
+        fail(f"port {port} is in use by another program; try --port {port + 1}")
+    print(f"Your report: {url}\nSaving to: {path}\nClose this window (or press Ctrl+C) to stop.")
+    if not args.no_browser:
+        webbrowser.open(url)
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        pass
+
+
+def cmd_launcher(args, today):
+    """Write open-report.cmd (Windows) and open-report.sh (macOS, Linux) beside the save file."""
+    path = Path(args.save).resolve()
+    script = Path(__file__).resolve()
+    note = "Opens your phd-compass report at http://localhost:8765, where you can star targets and log what you did. Close the window to stop it."
+    cmd = (f"@echo off\r\nrem {note}\r\ncd /d \"%~dp0\"\r\nwhere py >nul 2>nul\r\n"
+           f"if %errorlevel%==0 (py -3 \"{script}\" serve \"{path.name}\") else (python \"{script}\" serve \"{path.name}\")\r\n"
+           "if errorlevel 1 pause\r\n")
+    sh = f"#!/bin/sh\n# {note}\ncd \"$(dirname \"$0\")\"\nexec python3 \"{script}\" serve \"{path.name}\"\n"
+    (path.parent / "open-report.cmd").write_bytes(cmd.encode("utf-8"))
+    sh_path = path.parent / "open-report.sh"
+    sh_path.write_bytes(sh.encode("utf-8"))
+    try:
+        os.chmod(sh_path, 0o755)
+    except OSError:
+        pass
+    print(f"Wrote {path.parent / 'open-report.cmd'} and {sh_path}: double-click (Windows) or run ./open-report.sh to open the report.")
+
+
 # ---------------------------------------------------------------- agenda, ids, init
 
 def cmd_agenda(args, today):
@@ -848,7 +1020,8 @@ def main():
     p.add_argument("--today", help="YYYY-MM-DD; default: the system date")
     sub = p.add_subparsers(dest="cmd", required=True)
     for name, fn in (("init", cmd_init), ("validate", cmd_validate), ("sync", cmd_sync),
-                     ("report", cmd_report), ("agenda", cmd_agenda), ("next-id", cmd_next_id), ("log", cmd_log)):
+                     ("report", cmd_report), ("agenda", cmd_agenda), ("next-id", cmd_next_id), ("log", cmd_log), ("serve", cmd_serve),
+                     ("launcher", cmd_launcher)):
         sp = sub.add_parser(name)
         sp.add_argument("save", help="path to the save file (phd-compass.md)")
         sp.add_argument("--today", dest="today_sub", help="YYYY-MM-DD; default: the system date")
@@ -864,6 +1037,10 @@ def main():
         if name == "report":
             sp.add_argument("--out", help="output HTML path; default: phd-compass-report.html beside the save file")
             sp.add_argument("--template", help="report template; default: ../assets/report-template.html")
+        if name == "serve":
+            sp.add_argument("--port", type=int, default=8765)
+            sp.add_argument("--no-browser", action="store_true")
+            sp.add_argument("--template", help="report template; default: ../assets/report-template.html")
         if name == "agenda":
             sp.add_argument("--days", type=int, default=30, help="window in days (default 30)")
     args = p.parse_args()
@@ -871,6 +1048,7 @@ def main():
     if raw and not is_iso(raw):
         fail(f"--today must be YYYY-MM-DD, got {raw!r}")
     today = dt.date.fromisoformat(raw) if raw else dt.date.today()
+    args.today_given = bool(raw)
     args.fn(args, today)
 
 
