@@ -3,7 +3,7 @@ name: phd-compass
 description: Find funded PhD positions, doctoral programmes and research groups that fit a CV, in any field and country, and keep the whole search in a save file with an HTML report. Use when someone shares a CV to start a PhD search, ranks research interests, looks for PhD positions, programmes, scholarships or groups to contact, researches a professor or programme, checks PhD eligibility or funding, wants the PhD report refreshed, or uploads a phd-compass.md save file to continue.
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.1.0"
   family: phd-compass
 ---
 

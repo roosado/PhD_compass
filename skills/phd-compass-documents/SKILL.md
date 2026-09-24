@@ -3,7 +3,7 @@ name: phd-compass-documents
 description: Tailor a PhD applicant's CV and research proposal and draft emails to potential supervisors for a specific position, programme or group, in Word or LaTeX, and critique a motivation letter, statement of purpose, personal statement or any other draft as a selection committee would, checking fit, evidence and consistency with the CV. Use when someone wants a CV rebuilt or tailored for a PhD application, a research proposal, an email to a professor, or feedback on a cover letter, statement of purpose, personal statement or any draft. Works with a phd-compass.md save file or on its own.
 license: MIT
 metadata:
-  version: "1.0.1"
+  version: "1.1.0"
   family: phd-compass
 ---
 
